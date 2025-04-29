@@ -1,0 +1,20 @@
+---
+title: "Tutorial of mesounitR"
+author: "David Farò"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Tutorial of mesounitR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(mesounitR)
+```

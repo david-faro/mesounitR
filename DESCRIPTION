@@ -19,5 +19,7 @@ Imports:
     ClusterR,
     ggplot2,
     nngeo
-
-
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
