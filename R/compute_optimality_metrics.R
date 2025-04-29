@@ -6,9 +6,7 @@
 #' @param flow An `sf` object (sfc POLYGON) representing modeled flow areas (e.g., hydraulic model elements).
 #' @param flow_regions A list of mosaic region groupings (output from `supercell_to_units()`).
 #' @param range_n A numeric vector of unit counts associated with each mosaic.
-#' @param W_area Numeric. Reference (average) wetted area used to scale the meso-size metric.
-#' @param c_logmean Numeric. Mean of the empirical log-normal distribution for expected meso-sizes.
-#' @param c_logsd Numeric. Standard deviation of the empirical log-normal distribution for expected meso-sizes.
+#' @param c_params A data frame containing the parameters W_area, c_logmean and c_logsd
 #'
 #' @return A data frame containing:
 #' \describe{
@@ -29,7 +27,11 @@
 #' # scores <- compute_optimality_metrics(flow, flow_regions, range_n, W_area, c_logmean, c_logsd)
 #'
 #' @export
-compute_optimality_metrics <- function(flow, flow_regions,range_n,W_area,c_logmean,c_logsd) {
+compute_optimality_metrics <- function(flow, flow_regions,range_n,c_params) {
+
+  W_area <- c_params$W_area
+  c_logmean <- c_params$c_logmean
+  c_logsd <- c_params$c_logsd
 
   # Initialize metric vectors
   MI <- numeric()

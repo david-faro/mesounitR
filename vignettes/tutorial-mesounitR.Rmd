@@ -17,4 +17,145 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(mesounitR)
+library(sf)
+library(ggplot2)
+library(dplyr)
 ```
+
+Load sample data
+```{r}
+convert_points_to_voronoi <- function(flow_pts,depth_min) {
+
+  voronoi_polygons <- sf::st_voronoi(st_union(flow_pts))
+  
+  flow_voronoi <- sf::st_collection_extract(voronoi_polygons, type = "POLYGON") %>%
+    st_sf()
+  
+  # join original points (flow_pts) and voronoi polygons (flow_voronoi) to add attributes from original file
+  flow_joined <- st_join(flow_voronoi,flow_pts)
+  
+  # select only wetted points, based on depth_min value
+  flow_voronoi_wet <- flow_joined %>%
+    filter(DEPTH >= depth_min)
+  
+  # convert sf to df
+  flow_df <- as.data.frame(st_coordinates(flow_pts))
+  
+  ## compute convex hull. it will be filter out points outside of original hull
+  # Get convex hull indices
+  hull_idx <- chull(flow_df$X, flow_df$Y)
+  
+  # Close the polygon by repeating the first point
+  hull_coords <- rbind(flow_df[hull_idx, c('X','Y')], flow_df[hull_idx[1], c('X','Y')])
+  
+  # Create polygon
+  hull_polygon <- st_polygon(list(as.matrix(hull_coords)))
+  hull_sf <- st_sfc(hull_polygon, crs = st_crs(flow_pts)) |> st_sf()
+  
+  ## select polygons within hull
+  flow_wet <- flow_voronoi_wet[st_within(flow_voronoi_wet, hull_sf, sparse = FALSE)[,1], ]
+  
+  return(flow_wet)
+}
+
+# threshold to differentiate wet and dry elements
+depth_min <- 0.05
+
+# load points
+flow_pts <- sf::st_read('data/sample_Mareta.shp')
+
+# convert points to Voronoi polygons
+flow_wet <- convert_points_to_voronoi(flow_pts,depth_min)
+
+# clean out non-contiguous elements
+flow_wet <- mesounitR::clean_mesh(flow_wet)
+```
+
+Step 0) Retrieve empirical parameter for Global Score 
+```{r}
+#### compute empirical parameters from surveys
+
+## compute wetted channel widths --> used later during step 3
+# load centerline
+centerline <- st_read('data/centerline.shp')
+
+## dissolve the flow mesh into 1 polygon for the wetted channel
+# paremeter for holes to be filled (max_hole_area) might need to be adjusted
+channel_wet <- mesounitR::flow_to_wetchannel(flow_wet,depth_min,20)
+
+## compute average wetted channel width
+# --> parameters longitudinal distance (trans_longidst) and transect width (trans_width) might have to adjusted
+# --> calling function also plots transects, to give an idea if computation parameters should be adjusted
+W <- mesounitR::compute_widths(channel_wet,centerline,20,300)
+
+## load HMU maps
+hmu_map <- st_read('data/sample_Mareta_survey.shp')
+
+# if more maps availabe, computation should be repeated for each map (since W might change with changing discharge)
+c_params <- mesounitR::compute_empirical_mesosize(hmu_map,W)
+```
+
+Step 1) (over-)segment mesh into superpixels (super-cells ?)
+```{r}
+# define average supercell area
+area_supercell <- 50 # in m^2, or same unit as mesh
+# define compactness parameter of "SLIC" algorithm
+compactness <- 1000
+
+# compute supercells
+supercells <- mesounitR::elements_to_supercell(flow_wet,area_supercell,compactness)
+
+supercells %>%
+  ggplot() +
+  geom_sf(aes(fill=factor(cluster)),color=NA) +
+  theme_bw() +
+  theme(legend.position = 'none')
+
+#### write SP map
+# st_write(supercells,'supercells_area50.shp',delete_dsn=T)
+```
+step 2) regionalize superpixels to a mosaic composed of n units using SKATER spatial clustering algorithm (from spdep package)
+```{r}
+#### define computation range
+# number of potential regions in computed mosaics ranges from n_min to n_max, with increments defined by n_by
+n_min <- 10
+n_max <- 100
+n_by <- 10
+
+range_n <- seq(from=n_min,to=n_max,by=n_by)
+
+#### compute potential mosaics using SKATER algorithm
+tic()
+list_units <- mesounitR::supercell_to_units(supercells,range_n)
+toc()
+```
+
+step 3) Optimal segmentation
+Compute optimality metrics (v,MI,ms) and the derived Global Score (GS)
+--> select optimal region mosaic based on computed GS
+```{r}
+# compute optimality metrics
+optimality_metrics <- compute_optimality_metrics(flow_wet,list_units,range_n,c_params)
+
+p <- plot_segmentation_indicators(optimality_metrics)
+p
+
+# select optimal number of regions (and regionalization)
+opt_n <- optimal_n(optimality_metrics)
+opt_units <- list_units[[opt_n$i]]
+
+st_write(opt_units,paste0('optimal_mosaic_n',opt_n$n,'.shp'),delete_dsn=T)
+```
+
+
+step 2 bis) Refine GS curve, by adding additional mosaics with n units to the list
+```{r}
+# ## 
+range_n_toadd <- seq(25,65,by=10)
+list_units_old <- list_units
+add_units_results <- add_units(list_units_old,supercells,range_n_toadd)
+
+range_n <- add_units_results$range_n
+list_units <- add_units_results$list_units
+```
+

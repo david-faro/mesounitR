@@ -44,8 +44,8 @@ centerline_to_transects <- function(centerline,spacing,trans_width) {
     trans_new <- as.matrix(data.frame(x = c(tslines$x0[i],tslines$x1[i]),
                                       y = c(tslines$y0[i],tslines$y1[i]))) %>%
       sf::st_linestring() %>%
-      st_sfc(crs = st_crs(centerline)) %>%
-      st_sf()
+      sf::st_sfc(crs = st_crs(centerline)) %>%
+      sf::st_sf()
 
     transects <- rbind(transects,
                        trans_new)
