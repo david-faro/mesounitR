@@ -66,7 +66,7 @@ W <- mesounitR::compute_widths(channel_wet,centerline,20,300)
 c_params <- mesounitR::compute_empirical_mesosize(hmu_map,W)
 ```
 
-Step 1) (over-)segment mesh into superpixels (super-cells ?)
+Step 1) (over-)segment mesh into supercells
 ```{r}
 # define average supercell area
 area_supercell <- 50 # in m^2, or same unit as mesh
@@ -113,7 +113,8 @@ p
 opt_n <- optimal_n(optimality_metrics)
 opt_units <- list_units[[opt_n$i]]
 
-st_write(opt_units,paste0('optimal_mosaic_n',opt_n$n,'.shp'),delete_dsn=T)
+# write shp
+# st_write(opt_units,paste0('optimal_mosaic_n',opt_n$n,'.shp'),delete_dsn=T)
 ```
 
 
