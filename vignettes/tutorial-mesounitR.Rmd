@@ -16,56 +16,31 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-library(mesounitR)
 library(sf)
 library(ggplot2)
 library(dplyr)
+library(mesounitR)
+```
+Install mesounitR
+```{r}
+# install package from github
+# remotes::install_github("david-faro/mesounitR")
+
+# load library
+# library(mesounitR)
 ```
 
 Load sample data
 ```{r}
-convert_points_to_voronoi <- function(flow_pts,depth_min) {
-
-  voronoi_polygons <- sf::st_voronoi(st_union(flow_pts))
-  
-  flow_voronoi <- sf::st_collection_extract(voronoi_polygons, type = "POLYGON") %>%
-    st_sf()
-  
-  # join original points (flow_pts) and voronoi polygons (flow_voronoi) to add attributes from original file
-  flow_joined <- st_join(flow_voronoi,flow_pts)
-  
-  # select only wetted points, based on depth_min value
-  flow_voronoi_wet <- flow_joined %>%
-    filter(DEPTH >= depth_min)
-  
-  # convert sf to df
-  flow_df <- as.data.frame(st_coordinates(flow_pts))
-  
-  ## compute convex hull. it will be filter out points outside of original hull
-  # Get convex hull indices
-  hull_idx <- chull(flow_df$X, flow_df$Y)
-  
-  # Close the polygon by repeating the first point
-  hull_coords <- rbind(flow_df[hull_idx, c('X','Y')], flow_df[hull_idx[1], c('X','Y')])
-  
-  # Create polygon
-  hull_polygon <- st_polygon(list(as.matrix(hull_coords)))
-  hull_sf <- st_sfc(hull_polygon, crs = st_crs(flow_pts)) |> st_sf()
-  
-  ## select polygons within hull
-  flow_wet <- flow_voronoi_wet[st_within(flow_voronoi_wet, hull_sf, sparse = FALSE)[,1], ]
-  
-  return(flow_wet)
-}
-
 # threshold to differentiate wet and dry elements
 depth_min <- 0.05
 
-# load points
-flow_pts <- sf::st_read('data/sample_Mareta.shp')
+# load hydraulic simulation
+flow <- sf::st_read('data/sample_Mareta.shp')
 
-# convert points to Voronoi polygons
-flow_wet <- convert_points_to_voronoi(flow_pts,depth_min)
+# extract only wet polygons
+flow_wet <- flow %>%
+  filter(DEPTH >= depth_min)
 
 # clean out non-contiguous elements
 flow_wet <- mesounitR::clean_mesh(flow_wet)
@@ -73,25 +48,21 @@ flow_wet <- mesounitR::clean_mesh(flow_wet)
 
 Step 0) Retrieve empirical parameter for Global Score 
 ```{r}
-#### compute empirical parameters from surveys
-
-## compute wetted channel widths --> used later during step 3
 # load centerline
 centerline <- st_read('data/centerline.shp')
 
-## dissolve the flow mesh into 1 polygon for the wetted channel
-# paremeter for holes to be filled (max_hole_area) might need to be adjusted
-channel_wet <- mesounitR::flow_to_wetchannel(flow_wet,depth_min,20)
-
-## compute average wetted channel width
-# --> parameters longitudinal distance (trans_longidst) and transect width (trans_width) might have to adjusted
-# --> calling function also plots transects, to give an idea if computation parameters should be adjusted
-W <- mesounitR::compute_widths(channel_wet,centerline,20,300)
-
-## load HMU maps
+## load surveyed mesohabitat map
 hmu_map <- st_read('data/sample_Mareta_survey.shp')
 
-# if more maps availabe, computation should be repeated for each map (since W might change with changing discharge)
+## dissolve the flow mesh into 1 polygon for the wetted channel
+# adjust max_hole_area if needed
+channel_wet <- mesounitR::flow_to_wetchannel(flow_wet,depth_min,max_hole_area = 20)
+
+## compute average wetted channel width
+# adjust parameters trans_longidst and trans_width if needed
+W <- mesounitR::compute_widths(channel_wet,centerline,20,300)
+
+# compute parameters
 c_params <- mesounitR::compute_empirical_mesosize(hmu_map,W)
 ```
 
@@ -125,9 +96,7 @@ n_by <- 10
 range_n <- seq(from=n_min,to=n_max,by=n_by)
 
 #### compute potential mosaics using SKATER algorithm
-tic()
 list_units <- mesounitR::supercell_to_units(supercells,range_n)
-toc()
 ```
 
 step 3) Optimal segmentation
