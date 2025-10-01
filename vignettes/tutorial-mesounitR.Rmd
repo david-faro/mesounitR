@@ -8,6 +8,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -21,13 +22,14 @@ library(ggplot2)
 library(dplyr)
 library(mesounitR)
 ```
+
 Install mesounitR
 ```{r}
 # install package from github
 # remotes::install_github("david-faro/mesounitR")
 
 # load library
-# library(mesounitR)
+library(mesounitR)
 ```
 
 Load sample data
@@ -46,7 +48,7 @@ flow_wet <- flow %>%
 flow_wet <- mesounitR::clean_mesh(flow_wet)
 ```
 
-Step 0) Retrieve empirical parameter for Global Score 
+Step 0) Retrieve empirical parameter for Global Score
 ```{r}
 # load centerline
 centerline <- st_read('data/centerline.shp')
