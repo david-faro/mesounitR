@@ -5,7 +5,7 @@
 #'
 #' @param list_units_old A list of existing unit mosaics, each being a data.frame or similar object.
 #' @param supercells An object containing the supercell structure used to generate new unit mosaics.
-#' @param range_n_toadd A numeric vector indicating the sizes of new units to add from the supercells.
+#' @param n_range_toadd A numeric vector indicating the sizes of new units to add from the supercells.
 #'
 #' @return A list with two elements:
 #' \describe{
@@ -14,32 +14,41 @@
 #' }
 #'
 #' @examples
-#' # Assuming you have defined `supercells`, `list_units_old`, and `range_n_toadd`:
-#' # result <- add_units(list_units_old, supercells, range_n_toadd)
+#' # Assuming you have defined `supercells`, `list_units_old`, and `n_range_toadd`:
+#' # result <- add_units(list_units_old, supercells, n_range_toadd)
 #'
 #' @export
 #'
-add_units <- function(list_units_old,supercells,range_n_toadd) {
-  # Generate new units mosaics based on then n's defined in range_n_toadd
-  list_units_toadd <- supercell_to_units(supercells,range_n_toadd)
+add_units <- function(list_units_old,supercells,n_range_toadd) {
+
+  # Select only new n values
+  n_range_old <- numeric()
+
+  for (i in 1:length(list_units_old)) {
+
+    n_range_old[i] <- nrow(list_units_old[[i]])
+
+  }
+
+  n_range_new <- n_range_toadd[ ! n_range_toadd %in% n_range_old ]
+
+  # Generate new units mosaics based on then n's defined in n_range_toadd
+  list_units_toadd <- supercell_to_units(supercells,n_range_new)
 
   # Combine old and new mosaics lists
   list_units <- c(list_units_old,list_units_toadd)
 
-  # Compute size (number of rows) for each mosaic in the old list
-  range_n_old <- numeric()
-
-  for (i in 1:length(list_units_old)) {
-
-    range_n_old[i] <- nrow(list_units_old[[i]])
-
-  }
-
   # Combine n-ranges of old and new mosaics
-  range_n <- c(range_n_old,range_n_toadd)
+  n_range <- c(n_range_old,n_range_new)
+
+  # reorder
+  id.ordered <- order(n_range)
+
+  n_range <- n_range[id.ordered]
+  list_units <- list_units[id.ordered]
 
   # Return the combined list and the updated n-range vector
-  return(list(range_n = range_n,
+  return(list(n_range = n_range,
               list_units = list_units))
 
 }
