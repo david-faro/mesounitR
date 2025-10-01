@@ -19,11 +19,7 @@
 #' @details
 #' For each unit number in `n_range`, the function simulates random draws from
 #' the empirically defined log-normal distribution, computes probable resulting area,
-#' and compares the resulting area to the reference total `A_tot`. The deviation
-#' is quantified using \code{compute_index()}, and normalized across sample sizes using
-#' \code{sp_norm()}.
-#'
-#' @seealso [compute_index()]
+#' and compares the resulting area to the reference total `A_tot`.
 #'
 #' @importFrom dplyr group_by summarise mutate
 #' @export
@@ -59,7 +55,11 @@ compute_ms <- function(
   }
 
   # Compute ms index for each probable area
-  n_prob$index <- compute_index(n_prob$A, A_tot)
+
+  index <- abs(n_prob$A - A_tot) / A_tot
+  index[index >= 1] <- 1
+
+  n_prob$index <- index
 
   # Summarise by N and normalize
   n_summary <- n_prob |>
@@ -67,20 +67,4 @@ compute_ms <- function(
     dplyr::summarise(ms = mean(index), .groups = "drop")
 
   return(n_summary)
-}
-
-#' Compute index of deviation from reference
-#'
-#' Computes the normalized deviation of area `A` relative to a
-#' reference area `A_ref`. Deviations ≥ 1 are truncated to 1.
-#'
-#' @param A Numeric vector of simulated areas.
-#' @param A_ref Numeric reference area.
-#'
-#' @return Numeric vector of deviation indices.
-#' @noRd
-compute_index <- function(A, A_ref) {
-  ind <- abs(A - A_ref) / A_ref
-  ind[ind >= 1] <- 1
-  ind
 }

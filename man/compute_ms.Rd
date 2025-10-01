@@ -33,10 +33,5 @@ and computes a normalized index of deviation from a target area (total reach are
 \details{
 For each unit number in \code{n_range}, the function simulates random draws from
 the empirically defined log-normal distribution, computes probable resulting area,
-and compares the resulting area to the reference total \code{A_tot}. The deviation
-is quantified using \code{compute_index()}, and normalized across sample sizes using
-\code{sp_norm()}.
-}
-\seealso{
-\code{\link[=compute_index]{compute_index()}}
+and compares the resulting area to the reference total \code{A_tot}.
 }

@@ -4,14 +4,14 @@
 \alias{add_units}
 \title{Add Unit Mosaics to an Existing List of Units}
 \usage{
-add_units(list_units_old, supercells, range_n_toadd)
+add_units(list_units_old, supercells, n_range_toadd)
 }
 \arguments{
 \item{list_units_old}{A list of existing unit mosaics, each being a data.frame or similar object.}
 
 \item{supercells}{An object containing the supercell structure used to generate new unit mosaics.}
 
-\item{range_n_toadd}{A numeric vector indicating the sizes of new units to add from the supercells.}
+\item{n_range_toadd}{A numeric vector indicating the sizes of new units to add from the supercells.}
 }
 \value{
 A list with two elements:
@@ -25,7 +25,7 @@ This function extends an existing list of unit mosaics by adding new units
 generated from supercells based on a specified range of unit sizes.
 }
 \examples{
-# Assuming you have defined `supercells`, `list_units_old`, and `range_n_toadd`:
-# result <- add_units(list_units_old, supercells, range_n_toadd)
+# Assuming you have defined `supercells`, `list_units_old`, and `n_range_toadd`:
+# result <- add_units(list_units_old, supercells, n_range_toadd)
 
 }
