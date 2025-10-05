@@ -2,7 +2,7 @@
 % Please edit documentation in R/flow_to_wetchannel.R
 \name{flow_to_wetchannel}
 \alias{flow_to_wetchannel}
-\title{Create Wetted Channel Polygon from TIN Mesh}
+\title{Create Wetted Channel Polygon from HMU polygons or TIN Mesh}
 \usage{
 flow_to_wetchannel(flow_wet, max_hole_area)
 }
@@ -15,7 +15,6 @@ flow_to_wetchannel(flow_wet, max_hole_area)
 An \code{sf} polygon object representing the wetted channel, with small holes removed.
 }
 \description{
-Extracts the polygon of the wetted area from a computational mesh.
 Optionally removes small holes from the resulting geometry.
 }
 \details{

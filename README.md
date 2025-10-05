@@ -6,7 +6,33 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of mesounitR is to …
+The **mesounitR** software segments a river reach into a mosaic of
+mesohabitats using a three-step process (Fig. 1) based on outputs from
+2D hydraulic modeling.
+
+**Step 1:** Mesh elements from the hydraulic model, corresponding to
+river elements, are up-scaled into supercells, corresponding
+approximately to the scale of small hydraulic units (Fig. 1, A).
+
+**Step 2:** Potential habitat configurations are explored across the
+entire spatial spectrum, ranging from small hydraulic units
+(micro-scale) to the reach (macro-scale) (Fig. 1, B).
+
+**Step 3:** An optimal meso-scale configuration based on desired
+meso-scale characteristics is selected by minimizing a Global Score
+(Fig. 1, C). The Global Score is based on three metrics representing
+intra-segment homogeneity, inter-segment heterogeneity, and an optimal
+range of segment numbers based on an empirically defined meso-scale.
+
+The workflow is river-independent and fully unsupervised, as it does not
+require calibration or subjective choices of segmentation parameters.
+
+<figure>
+<img src="docs/figures/workflow_MesoUnit.png"
+alt="“Figure 1: 3 step mesohabitat segmentation”t" />
+<figcaption aria-hidden="true">“Figure 1: 3 step mesohabitat
+segmentation”t</figcaption>
+</figure>
 
 ## Installation
 
@@ -16,37 +42,38 @@ You can install the development version of mesounitR from
 ``` r
 # install.packages("pak")
 pak::pak("david-faro/mesounitR")
+
+# or
+# install.packages("devtools")
+# devtools::install_github("david-faro/mesounitR")
 ```
 
-## Example
+## Usage
 
-This is a basic example which shows you how to solve a common problem:
+The following tutorials are available:
 
-``` r
-library(mesounitR)
-## basic example code
-```
+- [Step-by-step tutorial on the usage of
+  mesounitR](vignettes/usage_tutorial.Rmd)
 
-What is special about using `README.Rmd` instead of just `README.md`?
-You can include R chunks like so:
+- [Step-by-step tutorial on the usage of
+  mesounitR](https://github.com/david-faro/mesounitR/blob/master/vignettes/tutorial-mesounitR.Rmd)
 
-``` r
-summary(cars)
-#>      speed           dist       
-#>  Min.   : 4.0   Min.   :  2.00  
-#>  1st Qu.:12.0   1st Qu.: 26.00  
-#>  Median :15.0   Median : 36.00  
-#>  Mean   :15.4   Mean   : 42.98  
-#>  3rd Qu.:19.0   3rd Qu.: 56.00  
-#>  Max.   :25.0   Max.   :120.00
-```
+- step-by-step tutorial on the usage of mesounitR
 
-You’ll still need to render `README.Rmd` regularly, to keep `README.md`
-up-to-date. `devtools::build_readme()` is handy for this.
+- integration with MesoHABSIM using Simstream-Web tool
 
-You can also embed plots, for example:
+## Issues
 
-<img src="man/figures/README-pressure-1.png" width="100%" />
+Submitting issues, bugs, or suggested feature improvements are highly
+encouraged for this repository.
 
-In that case, don’t forget to commit and push the resulting figure
-files, so they display on GitHub and CRAN.
+## References
+
+Please refer to the following for in-depth descriptions of the
+methodology and software:
+
+- Farò, D., Baumgartner, K., Vezza, P., & Zolezzi, G. (2022). A novel
+  unsupervised method for assessing mesoscale river habitat structure
+  and suitability from 2D hydraulic models in gravel-bed rivers.
+  Ecohydrology, 15(7), e2452. <https://doi.org/10.1002/eco.2452>
+- Vezza et al. (in review)
