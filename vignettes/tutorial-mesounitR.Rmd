@@ -38,7 +38,7 @@ Load sample data
 depth_min <- 0.05
 
 # load hydraulic simulation
-flow <- sf::st_read('data/sample_Mareta.shp')
+flow <- sf::st_read('data_tutorial1/Piave_Q21.5.shp')
 
 # extract only wet polygons
 flow_wet <- flow %>%
@@ -51,10 +51,10 @@ flow_wet <- mesounitR::clean_mesh(flow_wet)
 Step 0) Retrieve empirical parameter for Global Score
 ```{r}
 # load centerline
-centerline <- st_read('data/centerline.shp')
+centerline <- st_read('data_tutorial1/centerline.shp')
 
 ## load surveyed mesohabitat map
-hmu_map <- st_read('data/sample_Mareta_survey.shp')
+hmu_map <- st_read('data_tutorial1/Piave_survey_hmu.shp')
 
 ## dissolve the flow mesh into 1 polygon for the wetted channel
 # adjust max_hole_area if needed
@@ -92,7 +92,7 @@ step 2) regionalize superpixels to a mosaic composed of n units using SKATER spa
 #### define computation range
 # number of potential regions in computed mosaics ranges from n_min to n_max, with increments defined by n_by
 n_min <- 10
-n_max <- 150
+n_max <- 100
 n_by <- 10
 
 n_range <- seq(from=n_min,to=n_max,by=n_by)
@@ -109,9 +109,9 @@ Compute optimality metrics (v,MI,ms) and the derived Global Score (GS)
 A_tot <- as.numeric(sum(st_area(flow_wet)))
 
 # compute optimality metrics
-optimality_metrics <- compute_optimality_metrics(flow_wet,list_units,n_range,c_params,A_tot)
+optimality_metrics <- mesounitR::compute_optimality_metrics(flow_wet,list_units,n_range,c_params,A_tot)
 
-plot_segmentation_indicators(optimality_metrics)
+mesounitR::plot_segmentation_indicators(optimality_metrics)
 
 # select optimal number of regions (and regionalization)
 opt_n <- optimal_n(optimality_metrics)
@@ -119,20 +119,22 @@ opt_units <- list_units[[opt_n$i]]
 
 print(paste0('optimal n is ',opt_n$n))
 
-# write shp
+# write optimal shp
 # st_write(opt_units,paste0('optimal_mosaic_n',opt_n$n,'.shp'),delete_dsn=T)
 ```
 
 
 step 2 bis) Refine GS curve, by adding additional mosaics with n units to the list
 ```{r}
-# ## 
-n_range_toadd <- seq(45,75,by=5)
+# add mosaics with n units defined in n_range_toadd 
+n_range_toadd <- seq(20,40,by=2 )
 
 list_units_old <- list_units
-add_units_results <- add_units(list_units_old,supercells,n_range_toadd)
+add_units_results <- mesounitR::add_units(list_units_old,supercells,n_range_toadd)
 
 n_range <- add_units_results$n_range
 list_units <- add_units_results$list_units
+
+# --> re-run step 3 for updated results
 ```
 

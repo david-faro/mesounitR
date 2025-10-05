@@ -1,0 +1,73 @@
+---
+title: "File processing for MesoHABSIM"
+author: "David Farò"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{File processing for MesoHABSIM}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(sf)
+library(stars)
+library(ggplot2)
+library(dplyr)
+library(mesounitR)
+library(smoothr)
+```
+
+Load data
+```{r}
+# shapefile of mesohabitats mosaic
+poly_mesohabitats <- sf::st_read('data_tutorial2/mesohabitats.shp')
+
+# polygon shapefile of modelled mesh elements containing topographic elevation (Z) water depth (DEPTH) and flow velocity (VEL) distribution
+flow_ZDV <- sf::st_read('data_tutorial2/mesh_ZDV.shp')
+
+# covers (boulders, canopy shading, overhanging vegetation, roots, woody debris)
+poly_boulders <- sf::st_read('data_tutorial2/boulders.shp')
+poly_canopyshading <- sf::st_read('data_tutorial2/canopy_shading.shp')
+poly_overhang <- sf::st_read('data_tutorial2/overhanging_veg.shp')
+poly_roots <- sf::st_read('data_tutorial2/roots.shp')
+poly_woodydebris <- sf::st_read('data_tutorial2/woody_debris.shp')
+
+# raster substrate and codes of associated substrate classes
+ras_substrate <- stars::read_stars('data_tutorial2/substrates.tif')
+sub_codes <- data.frame(class_id = c(60,200,400),
+                        type = c('MICROLITHAL','MESOLITHAL','MACROLITHAL'))
+
+```
+Process
+```{r}
+# add refugia, connectivity, z_min and z_max to hmu shapefile
+poly_mesoHABSIM <- mesounitR::add_refugia(poly_mesohabitats, 
+                                          flow_ZDV,
+                                          poly_BOULDER=poly_boulders,
+                                          poly_CANOP_SHAD=poly_canopyshading,
+                                          poly_OVERHA_VEG=poly_overhang,
+                                          poly_ROOTS=poly_roots,
+                                          poly_SUBMER_VEG=NULL,
+                                          poly_EMERG_VEG=NULL,
+                                          poly_UNDERC_BAN=NULL,
+                                          poly_WOODY_DEBR=poly_woodydebris,
+                                          poly_RIPRAP=NULL,
+                                          poly_SHALL_MARG=NULL,
+                                          file_name='mesohabitats.shp')
+
+# if holes in mesohabitats --> fill (optional step; simstream.web cannot handle polygons with holes)
+# if this step is applied, real extension of polygons might need to be corrected after habitat suitability computations in SIMSTREAM
+# poly_mesoHABSIM_filled <- mesounitR::fill_holes(poly_mesoHABSIM,'mesohabitats_noholes.shp')
+
+# extract depth, velocity, substrate and save to .txt
+mesounitR::extract_DVS(poly_mesoHABSIM, flow_ZDV, ras_substrate, sub_codes, 'mesohabitats_DVS.txt')
+
+
+```

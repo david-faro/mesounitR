@@ -28,13 +28,17 @@ plot_segmentation_indicators <- function(optimal_metrics) {
     tidyr::pivot_longer(cols=c('MI','v','ms','GS'),values_to='value',names_to='variable') %>%
     mutate(variable = factor(variable,levels = c('MI','v','ms','GS'))) %>%
     ggplot2::ggplot(aes(x=n,y=value,color=variable,linetype=variable)) +
-    geom_line(linewidth=1.5) +
+    geom_line(linewidth=1) +
     scale_color_manual(values=c('grey','grey','grey','red')) +
     scale_linetype_manual(values=c('dotted','dashed','twodash','solid')) +
     scale_size_manual(values=c(1,1,1,1.5)) +
-    theme_bw() +
+    theme_bw(base_size=9) +
     labs(x='number of units - n',
-         y='normalized indicator value')
+         y='normalized indicator value',
+         color='index:',
+         linetype='index:') +
+    theme(legend.key.width=unit(1.5,"cm"),
+          legend.position='bottom')
 
   return(p)
 }
