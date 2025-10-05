@@ -7,8 +7,8 @@
 <!-- badges: end -->
 
 The **mesounitR** software segments a river reach into a mosaic of
-mesohabitats using a three-step process (Fig. 1) based on outputs from
-2D hydraulic modeling.
+mesohabitats using a three-step process based on outputs from 2D
+hydraulic modeling.
 
 **Step 1:** Mesh elements from the hydraulic model, corresponding to
 river elements, are up-scaled into supercells, corresponding
@@ -29,9 +29,9 @@ require calibration or subjective choices of segmentation parameters.
 
 <figure>
 <img src="docs/figures/workflow_MesoUnit.png"
-alt="“Figure 1: 3 step mesohabitat segmentation”t" />
-<figcaption aria-hidden="true">“Figure 1: 3 step mesohabitat
-segmentation”t</figcaption>
+alt="Figure 1: 3 step mesohabitat segmentation" />
+<figcaption aria-hidden="true">Figure 1: 3 step mesohabitat
+segmentation</figcaption>
 </figure>
 
 ## Installation
@@ -53,27 +53,25 @@ pak::pak("david-faro/mesounitR")
 The following tutorials are available:
 
 - [Step-by-step tutorial on the usage of
-  mesounitR](vignettes/usage_tutorial.Rmd)
-
-- [Step-by-step tutorial on the usage of
-  mesounitR](https://github.com/david-faro/mesounitR/blob/master/vignettes/tutorial-mesounitR.Rmd)
-
-- step-by-step tutorial on the usage of mesounitR
-
-- integration with MesoHABSIM using Simstream-Web tool
+  mesounitR](https://github.com/david-faro/mesounitR/vignettes/tutorial-mesounitR.Rmd)
+- [integration with MesoHABSIM using Simstream-Web
+  tool](https://github.com/david-faro/mesounitR/vignettes/processing_MesoHABSIM.Rmd)
 
 ## Issues
 
-Submitting issues, bugs, or suggested feature improvements are highly
-encouraged for this repository.
+Submitting [issues](https://github.com/david-faro/mesounitR/issues),
+bugs, or suggested feature improvements are highly encouraged for this
+repository.
 
 ## References
 
-Please refer to the following for in-depth descriptions of the
-methodology and software:
+Please refer to the following references for in-depth descriptions of
+the methodology and software:
 
 - Farò, D., Baumgartner, K., Vezza, P., & Zolezzi, G. (2022). A novel
   unsupervised method for assessing mesoscale river habitat structure
   and suitability from 2D hydraulic models in gravel-bed rivers.
-  Ecohydrology, 15(7), e2452. <https://doi.org/10.1002/eco.2452>
-- Vezza et al. (in review)
+  Ecohydrology, 15(7), e2452. [doi:
+  10.1002/eco.2452](https://doi.org/10.1002/eco.2452)
+- Vezza et al. (in review). Mesohabitat delineation in rivers using QGIS
+  and 2D hydrodynamic modeling.
