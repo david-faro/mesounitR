@@ -1,6 +1,5 @@
-#' Create Wetted Channel Polygon from TIN Mesh
+#' Create Wetted Channel Polygon from HMU polygons or TIN Mesh
 #'
-#' Extracts the polygon of the wetted area from a computational mesh.
 #' Optionally removes small holes from the resulting geometry.
 #'
 #' @param flow An `sf` object representing a mesh.

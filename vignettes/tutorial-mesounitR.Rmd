@@ -56,9 +56,12 @@ centerline <- st_read('data_tutorial1/centerline.shp')
 ## load surveyed mesohabitat map
 hmu_map <- st_read('data_tutorial1/Piave_survey_hmu.shp')
 
-## dissolve the flow mesh into 1 polygon for the wetted channel
+## dissolve flow_wet or surveyed HMU polygons into 1 polygon for the wetted channel
 # adjust max_hole_area if needed
-channel_wet <- mesounitR::flow_to_wetchannel(flow_wet,depth_min,max_hole_area = 20)
+channel_wet <- mesounitR::flow_to_wetchannel(hmu_map,max_hole_area = 20)
+
+# alternatively: use flow_wet if discharge same as surveyed hmu
+# channel_wet <- mesounitR::flow_to_wetchannel(flow_wet,max_hole_area = 20)
 
 ## compute average wetted channel width
 # adjust parameters trans_longidst and trans_width if needed
@@ -105,7 +108,7 @@ step 3) Optimal segmentation
 Compute optimality metrics (v,MI,ms) and the derived Global Score (GS)
 --> select optimal region mosaic based on computed GS
 ```{r}
-# compute wetted channel area
+# compute wetted channel area of modelled reach
 A_tot <- as.numeric(sum(st_area(flow_wet)))
 
 # compute optimality metrics
