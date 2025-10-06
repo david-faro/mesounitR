@@ -27,6 +27,26 @@
 #' @export
 optimal_n <- function(optimal_metrics) {
 
+  # --- Check object type ---
+  if (!is.data.frame(optimal_metrics)) {
+    stop("`optimal_metrics` must be a data.frame.")
+  }
+
+  # --- Check non-empty ---
+  if (nrow(optimal_metrics) == 0) {
+    stop("`optimal_metrics` cannot be empty.")
+  }
+
+  # --- Check required columns ---
+  required_cols <- c("GS", "n")
+  missing_cols <- setdiff(required_cols, names(optimal_metrics))
+  if (length(missing_cols) > 0) {
+    stop(paste0("`optimal_metrics` is missing required column(s): ",
+                paste(missing_cols, collapse = ", ")))
+  }
+
+  #### main function body ####
+
   GS <- optimal_metrics$GS
   n <- optimal_metrics$n
 

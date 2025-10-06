@@ -21,6 +21,23 @@
 #' @export
 dist2 <- function(pt1,pt2) {
 
+  # --- Check pt1 ---
+  if (!is.numeric(pt1)) {
+    stop("`pt1` must be numeric.")
+  }
+  if (any(is.na(pt1))) {
+    warning("`pt1` contains NA values.")
+  }
+
+  # --- Check pt2 ---
+  if (!is.numeric(pt2)) {
+    stop("`pt2` must be numeric.")
+  }
+  if (any(is.na(pt2))) {
+    warning("`pt2` contains NA values.")
+  }
+
+  #### main function body ####
 
   # repeat vector pt1 to length of pt2
   pt1 <- rep(pt1,nrow(pt2))

@@ -28,6 +28,34 @@
 
 segmentation_indicators <- function(units,flow_points,variable='VEL') {
 
+  # --- Check units ---
+  if (!inherits(units, "sf")) {
+    stop("`units` must be an sf object.")
+  }
+  geom_type <- unique(as.character(sf::st_geometry_type(units)))
+  if (!any(geom_type %in% c("POLYGON", "MULTIPOLYGON"))) {
+    stop("`units` must contain polygon geometries (POLYGON or MULTIPOLYGON).")
+  }
+  if (nrow(units) == 0) {
+    stop("`units` cannot be empty.")
+  }
+
+  # --- Check flow_points ---
+  if (!inherits(flow_points, "sf")) {
+    stop("`flow_points` must be an sf object.")
+  }
+  geom_type <- unique(as.character(sf::st_geometry_type(flow_points)))
+  if (!any(geom_type %in% c("POINT", "MULTIPOINT"))) {
+    stop("`flow_points` must contain point geometries (POINT or MULTIPOINT).")
+  }
+
+  # --- Check variable ---
+  if (!is.character(variable)) {
+    stop("`variable` must be of type character.")
+  }
+
+  #### main function body ####
+
   n <- nrow(units)
 
   ngbrs <- spdep::poly2nb(units)

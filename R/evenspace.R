@@ -27,6 +27,54 @@
 #' @export
 evenspace <- function(xy, sep, start=0){
 
+  # --- Check xy ---
+  if (!(is.matrix(xy) || is.data.frame(xy))) {
+    stop("`xy` must be a numeric matrix or data.frame.")
+  }
+
+  if (!all(sapply(xy, is.numeric))) {
+    stop("All columns in `xy` must be numeric.")
+  }
+
+  if (ncol(xy) > 2) {
+    warning("`xy` has more than two columns — only the first two may be used.")
+  }
+
+  if (nrow(xy) == 0) {
+    stop("`xy` cannot be empty.")
+  }
+
+  # --- Check sep ---
+  if (!is.numeric(sep)) {
+    stop("`sep` must be numeric.")
+  }
+  if (length(sep) != 1) {
+    stop("`sep` must be a single numeric value.")
+  }
+  if (is.na(sep) || sep <= 0) {
+    stop("`sep` must be a positive numeric value.")
+  }
+  if (is.na(sep)) {
+    stop("`sep` is NA")
+  }
+
+
+  # --- Check start ---
+  if (!is.numeric(start)) {
+    stop("`start` must be numeric.")
+  }
+  if (length(start) != 1) {
+    stop("`start` must be a single numeric value.")
+  }
+  if (is.na(start)) {
+    stop("`start` is NA")
+  }
+  if (is.na(sep) || sep <= 0) {
+    stop("`sep` must be a positive numeric value.")
+  }
+
+  #### main function body ####
+
   dx <- c(0,diff(xy[,1]))
   dy <- c(0,diff(xy[,2]))
   dseg <- sqrt(dx^2+dy^2)

@@ -21,7 +21,7 @@
 #' # transects <- centerline_to_transects(centerline, spacing = 50, trans_width = 20)
 #'
 #' @export
-centerline_to_transects <- function(centerline,spacing=50,trans_width=20) {
+centerline_to_transects <- function(centerline,spacing=10,trans_width=300) {
 
   # --- Check centerline ---
   if (!inherits(centerline, "sf")) {

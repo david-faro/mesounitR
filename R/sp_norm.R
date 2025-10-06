@@ -20,4 +20,37 @@
 #'
 #' @export
 
-sp_norm <- function(x,x.min,x.max) {(x-x.min)/(x.max-x.min)}
+sp_norm <- function(x,x.min,x.max) {
+
+  # --- Check x ---
+  if (!is.numeric(x)) {
+    stop("`x` must be numeric.")
+  }
+  if (length(x) == 0) {
+    stop("`x` cannot be empty.")
+  }
+  if (any(is.na(x))) {
+    warning("`x` contains NA values.")
+  }
+
+  # --- Check x.min ---
+  if (!is.numeric(x.min)) {
+    stop("`x.min` must be numeric.")
+  }
+  if (length(x.min) > 1) {
+    warning("`x.min` has more than one element — only the first will be used.")
+  }
+
+  # --- Check x.max ---
+  if (!is.numeric(x.max)) {
+    stop("`x.max` must be numeric.")
+  }
+  if (length(x.max) > 1) {
+    warning("`x.max` has more than one element — only the first will be used.")
+  }
+
+  #### main function body ####
+
+  (x-x.min)/(x.max-x.min)
+
+  }

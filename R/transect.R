@@ -14,6 +14,34 @@
 
 transect <- function( tpts, tlen){
 
+  # --- Check tpts ---
+  if (!(is.data.frame(tpts) || inherits(tpts, "tbl_df"))) {
+    stop("`tpts` must be a data.frame or tibble.")
+  }
+
+  required_cols <- c("x", "y")
+  missing_cols <- setdiff(required_cols, names(tpts))
+  if (length(missing_cols) > 0) {
+    stop(paste0("`tpts` is missing required column(s): ", paste(missing_cols, collapse = ", ")))
+  }
+
+  if (nrow(tpts) == 0) {
+    stop("`tpts` cannot be empty.")
+  }
+
+  # --- Check tlen ---
+  if (!is.numeric(tlen)) {
+    stop("`tlen` must be numeric.")
+  }
+  if (length(tlen) != 1) {
+    warning("`tlen` must be a single numeric value.")
+  }
+  if (is.na(tlen) || tlen <= 0) {
+    stop("`tlen` must be a positive numeric value.")
+  }
+
+  #### main function body ####
+
   tpts$thetaT = tpts$theta+pi/2
   dx = tlen*cos(tpts$thetaT)
   dy = tlen*sin(tpts$thetaT)
