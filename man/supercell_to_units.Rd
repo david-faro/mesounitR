@@ -4,15 +4,13 @@
 \alias{supercell_to_units}
 \title{Regionalize supercells into mosaic of n units Using SKATER Algorithm}
 \usage{
-supercell_to_units(mesh_supercell, range_n, parallelize = F)
+supercell_to_units(mesh_supercell, range_n)
 }
 \arguments{
 \item{mesh_supercell}{A \code{sf} object containing polygons (supercells) with at least columns \code{D_avg} and \code{V_avg}
 representing average depth and velocity, respectively.}
 
 \item{range_n}{A numeric vector specifying the target number of regions for each SKATER run.}
-
-\item{parallelize}{Logical. If \code{TRUE}, uses available CPU cores minus one to enable parallel processing. Default is \code{FALSE}.}
 }
 \value{
 A list of \code{sf} objects, each representing a segmentation into \code{n} spatial units (as defined in \code{range_n}),
@@ -21,7 +19,7 @@ with recalculated average depth (\code{D_avg}) and velocity (\code{V_avg}) for e
 \description{
 Applies spatial regionalization to supercell polygons using the SKATER algorithm.
 This function segments a mesh of supercells into spatial units based on
-average depth and velocity attributes. It supports optional parallel computation to speed up processing.
+average depth and velocity attributes.
 }
 \details{
 The function performs the following steps:
@@ -32,5 +30,4 @@ The function performs the following steps:
 \item Constructs a minimum spanning tree.
 \item Applies the SKATER algorithm for each target number of regions.
 }
-Parallelization is enabled by setting up a background cluster and configuring \code{spdep} options accordingly.
 }

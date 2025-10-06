@@ -31,33 +31,39 @@ compute_mn <- function(
     n_range,
     n_iter = 500) {
 
-  # Helper for single positive numeric values
-  check_single_positive <- function(x, name) {
-    if (!is.numeric(x)) stop(paste0("`", name, "` must be numeric."))
-    if (length(x) != 1) stop(paste0("`", name, "` must be a single numeric value."))
-    if (is.na(x) || x <= 0) stop(paste0("`", name, "` must be a positive numeric value."))
-  }
-
   # --- Check c_logmean ---
-  check_single_positive(c_logmean, "c_logmean")
+  if (!is.numeric(c_logmean) || length(c_logmean) != 1) { stop("'c_logmean' must be a single numeric value.")}
+  if (is.na(c_logmean)) stop(paste0("'c_logmean' is NA"))
 
   # --- Check c_logsd ---
-  check_single_positive(c_logsd, "c_logsd")
+  if (!is.numeric(c_logsd) || length(c_logsd) != 1) { stop("'c_logsd' must be a single numeric value.")}
+  if (is.na(c_logsd)) stop(paste0("'c_logsd' is NA"))
+  if (c_logsd <= 0) warning("`c_logsd` must be positive")
 
   # --- Check W_area ---
-  check_single_positive(W_area, "W_area")
+  if (!is.numeric(W_area) || length(W_area) != 1) { stop("'W_area' must be a single numeric value.")}
+  if (is.na(W_area)) stop(paste0("'W_area' is NA"))
+  if (W_area <= 0) warning("`W_area` must be positive")
 
   # --- Check A_tot ---
-  check_single_positive(A_tot, "A_tot")
+  if (!is.numeric(A_tot) || length(A_tot) != 1) { stop("'A_tot' must be a single numeric value.")}
+  if (is.na(A_tot)) stop(paste0("'A_tot' is NA"))
+  if (A_tot <= 0) warning("`A_tot` must be positive")
 
   # --- Check n_range ---
   if (!is.numeric(n_range)) stop("`n_range` must be numeric.")
   if (length(n_range) == 0) stop("`n_range` cannot be empty.")
   if (any(is.na(n_range))) warning("`n_range` contains NA values.")
   if (any(n_range <= 0)) warning("`n_range` contains non-positive values.")
+  if (any(n_range %% 1 != 0)) {stop("`n_range` must be an integer value (whole number).")}
 
   # --- Check n_iter ---
-  check_single_positive(n_iter, "n_iter")
+  if (!is.numeric(n_iter) || length(n_iter) != 1 || is.na(n_iter) || n_iter <= 0) {
+    stop("`n_iter` must be a single positive numeric value.")
+  }
+  if (n_iter %% 1 != 0) {
+    stop("`n_iter` must be an integer value (whole number).")
+  }
 
   #### continue main function body ####
 

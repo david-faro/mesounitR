@@ -37,10 +37,10 @@ clean_mesh <- function(mesh) {
 
   # --- Optional: Warn if empty or invalid geometries ---
   if (nrow(mesh) == 0) {
-    warning("`mesh` is empty — no geometries found.")
+    warning("'mesh' is empty - no geometries found.")
   }
   if (any(!sf::st_is_valid(mesh))) {
-    warning("`mesh` contains invalid geometries.")
+    warning("'mesh' contains invalid geometries.")
   }
 
   #### continue with main function body ####

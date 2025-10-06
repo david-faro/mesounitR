@@ -9,13 +9,13 @@ plot_segmentation_indicators(optimal_metrics)
 \arguments{
 \item{optimal_metrics}{A data frame returned by \code{compute.optmetrics()}, containing
 normalized indicators with one column named \code{n} and additional columns for each metric
-(e.g., \code{MI}, \code{v}, \code{ms}, \code{GS}).}
+(e.g., \code{MI}, \code{v}, \code{mn}, \code{GS}).}
 }
 \value{
 A \code{ggplot2} object displaying the trend of segmentation indicators over values of \code{n}.
 }
 \description{
-Visualizes segmentation quality indicators (e.g., MI, v, ms, GS) across different values of \code{n}
+Visualizes segmentation quality indicators (e.g., MI, v, mn, GS) across different values of \code{n}
 from an object produced by \code{compute.optmetrics()}.
 }
 \details{
@@ -25,7 +25,7 @@ while other indicators are shown in gray with different line types.
 }
 \examples{
 \dontrun{
-optimal_metrics <- compute.optmetrics(...)  # assuming output contains 'n', 'MI', 'v', 'ms', 'GS'
+optimal_metrics <- compute.optmetrics(...)  # assuming output contains 'n', 'MI', 'v', 'mn', 'GS'
 plot_segmentation_indicators(optimal_metrics)
 }
 

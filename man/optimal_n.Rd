@@ -30,7 +30,7 @@ The function identifies the index of the minimum \code{GS} value and returns the
 \examples{
 gs_values <- c(0.3, 0.2, 0.15, 0.25)
 n_values <- seq(1, 4)
-optimal_metrics <- list(GS = gs_values, n = n_values)
+optimal_metrics <- data.frame(GS = gs_values, n = n_values)
 optimal_n(optimal_metrics)
 
 }

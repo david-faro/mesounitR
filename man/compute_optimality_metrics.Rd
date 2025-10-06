@@ -2,9 +2,9 @@
 % Please edit documentation in R/compute_optimality_metrics.R
 \name{compute_optimality_metrics}
 \alias{compute_optimality_metrics}
-\title{Compute Normalized Optimality Metrics (v,MI,ms) and combine into Global Score}
+\title{Compute Normalized Optimality Metrics (v,MI,mn) and combine into Global Score}
 \usage{
-compute_optimality_metrics(flow, flow_regions, n_range, c_params, A_tot)
+compute_optimality_metrics(flow, flow_regions, n_range, c_paramn, A_tot)
 }
 \arguments{
 \item{flow}{An \code{sf} object (sfc POLYGON) representing modeled flow areas (e.g., hydraulic model elements).}
@@ -13,7 +13,7 @@ compute_optimality_metrics(flow, flow_regions, n_range, c_params, A_tot)
 
 \item{n_range}{A numeric vector of unit counts associated with each mosaic.}
 
-\item{c_params}{A data frame containing the parameters W_area, c_logmean and c_logsd}
+\item{c_paramn}{A data frame containing the parameters W_area, c_logmean and c_logsd}
 
 \item{A_tot}{A numeric vector with the total (wetted) channel area}
 }
@@ -23,18 +23,18 @@ A data frame containing:
 \item{n}{Number of units per mosaic.}
 \item{MI}{Normalized Moran's I}
 \item{v}{Normalized weighted averaged variance}
-\item{ms}{Normalized meso-size index}
-\item{GS}{Global Score, calculated as the mean of MI, v, and ms.}
+\item{mn}{Normalized meso-number index}
+\item{GS}{Global Score, calculated as the mean of MI, v, and mn.}
 }
 }
 \description{
-This function calculates three normalized optimality metrics, the Moran's I (MI), weighted averaged variance (v), and meso-size index (ms), for a list of mosaic regions and combines
+This function calculates three normalized optimality metrics, the Moran's I (MI), weighted averaged variance (v), and meso-number index (mn), for a list of mosaic regions and combines
 them into a Global Score (GS).
 }
 \details{
 \itemize{
 \item MI and v are computed using the \code{segmentation_indicators()} function on each mosaic.
-\item ms is calculated based on an expected log-normal distribution.
+\item mn is calculated based on an expected log-normal distribution of meso-sizes.
 \item All three metrics are normalized using \code{sp_norm()} and combined into a global performance score (GS).
 }
 }

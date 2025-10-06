@@ -55,6 +55,8 @@ add_units <- function(list_units_old,supercells,n_range_toadd) {
   if (any(is.na(n_range_toadd))) {
     warning("`n_range_toadd` contains NA values.")
   }
+  if (any(n_range_toadd %% 1 != 0)) {stop("`n_range_toadd` must be an integer value (whole number).")}
+
 
   # continue with main function body
 

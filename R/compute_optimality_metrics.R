@@ -71,6 +71,7 @@ compute_optimality_metrics <- function(flow, flow_regions,n_range,c_paramn,A_tot
   if (any(is.na(n_range))) {
     warning("`n_range` contains NA values.")
   }
+  if (any(n_range %% 1 != 0)) {stop("`n_range` must be an integer value (whole number).")}
 
   # --- Check c_paramn ---
   if (!is.data.frame(c_paramn)) {
@@ -86,11 +87,6 @@ compute_optimality_metrics <- function(flow, flow_regions,n_range,c_paramn,A_tot
   if (any(non_numeric)) {
     stop(paste0("The following columns in `c_paramn` must be numeric: ",
                 paste(required_cols[non_numeric], collapse = ", ")))
-  }
-  non_positive <- sapply(c_paramn[required_cols], function(x) any(x <= 0, na.rm = TRUE))
-  if (any(non_positive)) {
-    warning(paste0("Some values in `c_paramn` are non-positive: ",
-                   paste(required_cols[non_positive], collapse = ", ")))
   }
 
   # --- Check A_tot ---
@@ -142,3 +138,10 @@ compute_optimality_metrics <- function(flow, flow_regions,n_range,c_paramn,A_tot
                     GS = (MI + v + mn)/3))
 
 }
+
+
+# --------------------------------------------------------------------
+# Internal helper functions (not exported)
+# --------------------------------------------------------------------
+
+sp_norm <- function(x,x.min,x.max) {  (x-x.min)/(x.max-x.min)}

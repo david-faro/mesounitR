@@ -34,7 +34,7 @@ compute_widths <- function(poly_wetchannel,centerline,trans_longdist=10,trans_wi
   }
 
   if (nrow(poly_wetchannel) > 1) {
-    warning("`poly_wetchannel` contains more than one polygon — only the first may be used.")
+    warning("`poly_wetchannel` contains more than one polygon - only the first may be used.")
   }
 
   # --- Check centerline ---
@@ -47,7 +47,7 @@ compute_widths <- function(poly_wetchannel,centerline,trans_longdist=10,trans_wi
   }
 
   if (nrow(centerline) > 1) {
-    warning("`centerline` contains more than one polygon — only the first may be used.")
+    warning("`centerline` contains more than one polygon - only the first may be used.")
   }
 
   # --- Helper for numeric scalar > 0 ---
@@ -79,4 +79,93 @@ compute_widths <- function(poly_wetchannel,centerline,trans_longdist=10,trans_wi
 
   # return average width value
   return(mean(widths, na.rm = T))
+}
+
+# --------------------------------------------------------------------
+# Internal helper functions (not exported)
+# --------------------------------------------------------------------
+
+# Evenly Space Points Along a Line
+evenspace <- function(xy, sep, start=0){
+
+  dx <- c(0,diff(xy[,1]))
+  dy <- c(0,diff(xy[,2]))
+  dseg <- sqrt(dx^2+dy^2)
+  dtotal <- cumsum(dseg)
+
+  linelength = sum(dseg)
+
+  pos = seq(start,linelength, by=sep)
+
+  whichseg = unlist(lapply(pos, function(x){sum(dtotal<=x)}))
+
+  pos=data.frame(pos=pos,whichseg=whichseg,
+                 x0=xy[whichseg,1],
+                 y0=xy[whichseg,2],
+                 dseg = dseg[whichseg+1],
+                 dtotal = dtotal[whichseg],
+                 x1=xy[whichseg+1,1],
+                 y1=xy[whichseg+1,2]
+  )
+
+  pos$further =  pos$pos - pos$dtotal
+  pos$f = pos$further/pos$dseg
+  pos$x = pos$x0 + pos$f * (pos$x1-pos$x0)
+  pos$y = pos$y0 + pos$f * (pos$y1-pos$y0)
+
+  pos$theta = atan2(pos$y0-pos$y1,pos$x0-pos$x1)
+
+  return(pos[,c("x","y","x0","y0","x1","y1","theta")])
+
+}
+
+# Generate Transects from a Channel Centerline
+centerline_to_transects <- function(centerline,spacing=10,trans_width=300) {
+
+  # extract centerline coordinates
+  centerline_coord <- sf::st_coordinates(centerline)
+
+  # Generate evenly spaced points along the centerline
+  tspts = evenspace(centerline_coord,spacing)
+
+  # Generate perpendicular transect line endpoints
+  tslines = transect(tspts,trans_width)
+
+  # Create list of LINESTRING geometries for each transect
+  transects <- as.matrix(data.frame(x = c(tslines$x0[1],tslines$x1[1]),
+                                    y = c(tslines$y0[1],tslines$y1[1]))) %>%
+    sf::st_linestring() %>%
+    sf::st_sfc(crs = sf::st_crs(centerline)) %>%
+    sf::st_sf()
+
+  for (i in 2:nrow(tslines)) {
+
+    trans_new <- as.matrix(data.frame(x = c(tslines$x0[i],tslines$x1[i]),
+                                      y = c(tslines$y0[i],tslines$y1[i]))) %>%
+      sf::st_linestring() %>%
+      sf::st_sfc(crs = st_crs(centerline)) %>%
+      sf::st_sf()
+
+    transects <- rbind(transects,
+                       trans_new)
+
+  }
+
+  return(transects)
+
+}
+
+# Compute Transects Perpendicular to a Line
+transect <- function( tpts, tlen){
+
+  tpts$thetaT = tpts$theta+pi/2
+  dx = tlen*cos(tpts$thetaT)
+  dy = tlen*sin(tpts$thetaT)
+  return(
+    data.frame(x0 = tpts$x + dx,
+               y0 = tpts$y + dy,
+               x1 = tpts$x - dx,
+               y1 = tpts$y -dy)
+  )
+
 }

@@ -124,3 +124,24 @@ elements_to_supercell <- function(mesh,sc_area,compactness) {
 
   return(mesh_sc)
 }
+
+# --------------------------------------------------------------------
+# Internal helper functions (not exported)
+# --------------------------------------------------------------------
+
+# Compute Euclidean Distance Between a Point and Multiple Points
+dist2 <- function(pt1,pt2) {
+
+  # repeat vector pt1 to length of pt2
+  pt1 <- rep(pt1,nrow(pt2))
+
+  # Compute Euclidean distances using vectorized functions
+  dx <- pt2$x - pt1$x
+  dy <- pt2$y - pt1$y
+
+  dist <- sqrt(dx^2+dy^2)
+
+  return(dist)
+
+}
+
