@@ -1,8 +1,8 @@
-#' Create Wetted Channel Polygon from HMU polygons or TIN Mesh
+#' Create Wetted Channel Polygon from Mesh or HMU polygons
 #'
 #' Optionally removes small holes from the resulting geometry.
 #'
-#' @param flow An `sf` object representing a mesh.
+#' @param flow_wet An `sf` object representing a mesh or HMU polygons
 #' @param max_hole_area Numeric. Maximum hole area threshold. Holes smaller than this value will be filled (removed).
 #'
 #' @return An `sf` polygon object representing the wetted channel, with small holes removed.

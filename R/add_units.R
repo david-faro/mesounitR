@@ -21,6 +21,44 @@
 #'
 add_units <- function(list_units_old,supercells,n_range_toadd) {
 
+  # --- Check list_units_old ---
+  if (!is.list(list_units_old)) {
+    stop("`list_units_old` must be a list.")
+  }
+  if (length(list_units_old) == 0) {
+    stop("`list_units_old` cannot be empty. It must contain at least one element.")
+  }
+  # Check if it contains at least one sf polygon
+  is_sf_poly <- sapply(list_units_old, function(x) {
+    inherits(x, "sf") && any(sf::st_geometry_type(x) %in% c("POLYGON", "MULTIPOLYGON"))
+  })
+  if (!any(is_sf_poly)) {
+    stop("`list_units_old` must contain at least one 'sf' polygon object.")
+  }
+
+  # --- Check supercells ---
+  if (!inherits(supercells, "sf")) {
+    stop("`supercells` must be an sf object.")
+  }
+  geom_type <- unique(as.character(sf::st_geometry_type(supercells)))
+  if (!any(geom_type %in% c("POLYGON", "MULTIPOLYGON"))) {
+    stop("`supercells` must contain polygon geometries.")
+  }
+
+  # --- Check n_range_toadd ---
+  if (!is.numeric(n_range_toadd)) {
+    stop("`n_range_toadd` must be numeric.")
+  }
+  if (length(n_range_toadd) == 0) {
+    warning("`n_range_toadd` is empty.")
+  }
+  if (any(is.na(n_range_toadd))) {
+    warning("`n_range_toadd` contains NA values.")
+  }
+
+  # continue with main function body
+
+
   # Select only new n values
   n_range_old <- numeric()
 

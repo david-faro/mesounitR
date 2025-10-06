@@ -24,6 +24,27 @@
 #' @export
 clean_mesh <- function(mesh) {
 
+  # --- Check that mesh is an sf object ---
+  if (!inherits(mesh, "sf")) {
+    stop("`mesh` must be an sf object.")
+  }
+
+  # --- Check that geometry type is polygonal ---
+  geom_type <- unique(as.character(sf::st_geometry_type(mesh)))
+  if (!any(geom_type %in% c("POLYGON", "MULTIPOLYGON"))) {
+    stop("`mesh` must contain polygon geometries (POLYGON or MULTIPOLYGON).")
+  }
+
+  # --- Optional: Warn if empty or invalid geometries ---
+  if (nrow(mesh) == 0) {
+    warning("`mesh` is empty — no geometries found.")
+  }
+  if (any(!sf::st_is_valid(mesh))) {
+    warning("`mesh` contains invalid geometries.")
+  }
+
+  #### continue with main function body ####
+
   # Merge all neighboring polygons into contiguous areas
   mesh_merged <- sf::st_cast(st_union(mesh), "POLYGON")
 

@@ -45,7 +45,7 @@ pak::pak("david-faro/mesounitR")
 
 # or
 # install.packages("devtools")
-# devtools::install_github("david-faro/mesounitR")
+# remotes::install_github("david-faro/mesounitR")
 ```
 
 ## Usage

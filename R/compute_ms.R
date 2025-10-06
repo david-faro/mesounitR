@@ -62,8 +62,8 @@ compute_ms <- function(
   n_prob$index <- index
 
   # Summarise by N and normalize
-  n_summary <- n_prob |>
-    dplyr::group_by(n) |>
+  n_summary <- n_prob %>%
+    dplyr::group_by(n) %>%
     dplyr::summarise(ms = mean(index), .groups = "drop")
 
   return(n_summary)

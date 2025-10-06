@@ -7,9 +7,7 @@
 #' @param poly_mesohabitats An \code{sf} object with mesohabitat polygons.
 #' @param flow An \code{sf} object with flow points containing at least the columns
 #'   \code{Z} (bed elevation) and \code{DEPTH} (water depth).
-#' @param poly_BOULDER,poly_CANOP_SHAD,poly_OVERHA_VEG,poly_ROOTS,
-#'   poly_SUBMER_VEG,poly_EMERG_VEG,poly_UNDERC_BAN,poly_WOODY_DEBR,
-#'   poly_RIPRAP,poly_SHALL_MARG Optional \code{sf} polygon layers representing
+#' @param poly_BOULDER,poly_CANOP_SHAD,poly_OVERHA_VEG,poly_ROOTS,poly_SUBMER_VEG,poly_EMERG_VEG,poly_UNDERC_BAN,poly_WOODY_DEBR,poly_RIPRAP,poly_SHALL_MARG Optional \code{sf} polygon layers representing
 #'   different types of refugia (may be \code{NULL}).
 #' @param file_name Character string with the output shapefile path and name. Default: 'mesohabitats.shp'
 #'
@@ -186,23 +184,25 @@ add_zmaxmin <- function(poly_mesohabitats, flow) {
 
   flow$wse <- flow$Z + flow$DEPTH
 
-  n <- nrow(poly_mesohabitats)
+  # Perform spatial join: each flow point gets the polygon it falls into
+  flow_with_poly <- sf::st_join(flow, poly_mesohabitats["HMU_NUM"], join = st_intersects)
 
-  z_min <- vector()
-  z_max <- vector()
+  flow_with_poly <- flow_with_poly %>%
+    filter(!is.na(HMU_NUM))
 
-  for (i in 1:n) {
-    # select only flow points within unit i
-    pts_touching <- as.matrix(sf::st_intersects(poly_mesohabitats[i,],flow))
-    wse_pts <- flow[pts_touching,]
+  # Remove geometry for faster aggregation
+  flow_df <- sf::st_set_geometry(flow_with_poly, NULL)
 
-    z_min[i] <- min(wse_pts$wse)
-    z_max[i] <- max(wse_pts$wse)
+  # Compute min and max per unit
+  z_summary <- flow_df %>%
+    group_by(HMU_NUM) %>%
+    summarise(
+      z_min = min(wse, na.rm = TRUE),
+      z_max = max(wse, na.rm = TRUE)
+    )
 
-  }
-
-  poly_mesohabitats$Z_MIN <- z_min
-  poly_mesohabitats$Z_MAX <- z_max
+  poly_mesohabitats$Z_MIN <- z_summary$z_min
+  poly_mesohabitats$Z_MAX <- z_summary$z_max
 
   return(poly_mesohabitats)
 

@@ -18,7 +18,8 @@ Imports:
     spdep,
     ClusterR,
     ggplot2,
-    nngeo
+    nngeo,
+    stars
 Suggests: 
     knitr,
     rmarkdown

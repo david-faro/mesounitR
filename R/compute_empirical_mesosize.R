@@ -22,6 +22,39 @@
 #' @export
 compute_empirical_mesosize <- function(hmu_map,W) {
 
+  # --- Check hmu_map ---
+  if (!inherits(hmu_map, "sf")) {
+    stop("`hmu_map` must be an sf object.")
+  }
+
+  geom_type <- unique(as.character(sf::st_geometry_type(hmu_map)))
+  if (!any(geom_type %in% c("POLYGON", "MULTIPOLYGON"))) {
+    stop("`hmu_map` must contain polygon geometries (POLYGON or MULTIPOLYGON).")
+  }
+
+  if (nrow(hmu_map) == 0) {
+    stop("`hmu_map` cannot be empty.")
+  }
+
+  if (any(!sf::st_is_valid(hmu_map))) {
+    warning("`hmu_map` contains invalid geometries.")
+  }
+
+  # --- Check W ---
+  if (!is.numeric(W)) {
+    stop("`W` must be numeric.")
+  }
+
+  if (length(W) != 1) {
+    warning("`W` should be a single numeric value.")
+  }
+
+  if (is.na(W) || W <= 0) {
+    stop("`W` must be a positive numeric value.")
+  }
+
+  #### continue with main function body ####
+
   # compute area
   W_area <- W^2
 

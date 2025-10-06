@@ -26,6 +26,10 @@ library(mesounitR)
 Install mesounitR
 ```{r}
 # install package from github
+# install.packages("pak")
+# pak::pak("david-faro/mesounitR")
+
+# OR
 # remotes::install_github("david-faro/mesounitR")
 
 # load library
@@ -38,14 +42,14 @@ Load sample data
 depth_min <- 0.05
 
 # load hydraulic simulation
-flow <- sf::st_read('data_tutorial1/Piave_Q21.5.shp')
+flow <- sf::st_read('data_tutorial1/flow_DV.shp')
 
 # extract only wet polygons
 flow_wet <- flow %>%
   filter(DEPTH >= depth_min)
 
 # clean out non-contiguous elements
-flow_wet <- mesounitR::clean_mesh(flow_wet)
+flow_wet <- clean_mesh(flow_wet)
 ```
 
 Step 0) Retrieve empirical parameter for Global Score
@@ -54,21 +58,21 @@ Step 0) Retrieve empirical parameter for Global Score
 centerline <- st_read('data_tutorial1/centerline.shp')
 
 ## load surveyed mesohabitat map
-hmu_map <- st_read('data_tutorial1/Piave_survey_hmu.shp')
+hmu_map <- st_read('data_tutorial1/survey_hmu.shp')
 
 ## dissolve flow_wet or surveyed HMU polygons into 1 polygon for the wetted channel
 # adjust max_hole_area if needed
-channel_wet <- mesounitR::flow_to_wetchannel(hmu_map,max_hole_area = 20)
+channel_wet <- flow_to_wetchannel(hmu_map,max_hole_area = 20)
 
 # alternatively: use flow_wet if discharge same as surveyed hmu
-# channel_wet <- mesounitR::flow_to_wetchannel(flow_wet,max_hole_area = 20)
+# channel_wet <- flow_to_wetchannel(flow_wet,max_hole_area = 20)
 
 ## compute average wetted channel width
 # adjust parameters trans_longidst and trans_width if needed
-W <- mesounitR::compute_widths(channel_wet,centerline,20,300)
+W <- compute_widths(channel_wet,centerline,20,300)
 
 # compute parameters
-c_params <- mesounitR::compute_empirical_mesosize(hmu_map,W)
+c_params <- compute_empirical_mesosize(hmu_map,W)
 ```
 
 Step 1) (over-)segment mesh into supercells
@@ -79,7 +83,7 @@ area_supercell <- 50 # in m^2, or same unit as mesh
 compactness <- 1000
 
 # compute supercells
-supercells <- mesounitR::elements_to_supercell(flow_wet,area_supercell,compactness)
+supercells <- elements_to_supercell(flow_wet,area_supercell,compactness)
 
 supercells %>%
   ggplot() +
@@ -88,7 +92,7 @@ supercells %>%
   theme(legend.position = 'none')
 
 #### write SP map
-# st_write(supercells,'supercells_area50.shp',delete_dsn=T)
+# st_write(supercells,'supercells.shp',delete_dsn=T)
 ```
 step 2) regionalize superpixels to a mosaic composed of n units using SKATER spatial clustering algorithm (from spdep package)
 ```{r}
@@ -96,12 +100,12 @@ step 2) regionalize superpixels to a mosaic composed of n units using SKATER spa
 # number of potential regions in computed mosaics ranges from n_min to n_max, with increments defined by n_by
 n_min <- 10
 n_max <- 100
-n_by <- 10
+n_by <- 15
 
 n_range <- seq(from=n_min,to=n_max,by=n_by)
 
 #### compute potential mosaics using SKATER algorithm
-list_units <- mesounitR::supercell_to_units(supercells,n_range)
+list_units <- supercell_to_units(supercells,n_range)
 ```
 
 step 3) Optimal segmentation
@@ -112,9 +116,9 @@ Compute optimality metrics (v,MI,ms) and the derived Global Score (GS)
 A_tot <- as.numeric(sum(st_area(flow_wet)))
 
 # compute optimality metrics
-optimality_metrics <- mesounitR::compute_optimality_metrics(flow_wet,list_units,n_range,c_params,A_tot)
+optimality_metrics <- compute_optimality_metrics(flow_wet,list_units,n_range,c_params,A_tot)
 
-mesounitR::plot_segmentation_indicators(optimality_metrics)
+plot_segmentation_indicators(optimality_metrics)
 
 # select optimal number of regions (and regionalization)
 opt_n <- optimal_n(optimality_metrics)
@@ -130,14 +134,13 @@ print(paste0('optimal n is ',opt_n$n))
 step 2 bis) Refine GS curve, by adding additional mosaics with n units to the list
 ```{r}
 # add mosaics with n units defined in n_range_toadd 
-n_range_toadd <- seq(20,40,by=2 )
+n_range_toadd <- seq(35,37,by=1)
 
 list_units_old <- list_units
-add_units_results <- mesounitR::add_units(list_units_old,supercells,n_range_toadd)
+add_units_results <- add_units(list_units_old,supercells,n_range_toadd)
 
 n_range <- add_units_results$n_range
 list_units <- add_units_results$list_units
 
-# --> re-run step 3 for updated results
 ```
-
+--> re-run step 3 for updated results

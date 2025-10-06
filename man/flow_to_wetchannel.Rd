@@ -2,14 +2,14 @@
 % Please edit documentation in R/flow_to_wetchannel.R
 \name{flow_to_wetchannel}
 \alias{flow_to_wetchannel}
-\title{Create Wetted Channel Polygon from HMU polygons or TIN Mesh}
+\title{Create Wetted Channel Polygon from Mesh or HMU polygons}
 \usage{
 flow_to_wetchannel(flow_wet, max_hole_area)
 }
 \arguments{
-\item{max_hole_area}{Numeric. Maximum hole area threshold. Holes smaller than this value will be filled (removed).}
+\item{flow_wet}{An \code{sf} object representing a mesh or HMU polygons}
 
-\item{flow}{An \code{sf} object representing a mesh.}
+\item{max_hole_area}{Numeric. Maximum hole area threshold. Holes smaller than this value will be filled (removed).}
 }
 \value{
 An \code{sf} polygon object representing the wetted channel, with small holes removed.

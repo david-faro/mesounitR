@@ -26,8 +26,7 @@ add_refugia(
 \item{flow}{An \code{sf} object with flow points containing at least the columns
 \code{Z} (bed elevation) and \code{DEPTH} (water depth).}
 
-\item{poly_BOULDER, poly_CANOP_SHAD, poly_OVERHA_VEG, poly_ROOTS, }{poly_SUBMER_VEG,poly_EMERG_VEG,poly_UNDERC_BAN,poly_WOODY_DEBR,
-poly_RIPRAP,poly_SHALL_MARG Optional \code{sf} polygon layers representing
+\item{poly_BOULDER, poly_CANOP_SHAD, poly_OVERHA_VEG, poly_ROOTS, poly_SUBMER_VEG, poly_EMERG_VEG, poly_UNDERC_BAN, poly_WOODY_DEBR, poly_RIPRAP, poly_SHALL_MARG}{Optional \code{sf} polygon layers representing
 different types of refugia (may be \code{NULL}).}
 
 \item{file_name}{Character string with the output shapefile path and name. Default: 'mesohabitats.shp'}

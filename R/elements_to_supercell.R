@@ -52,7 +52,7 @@ elements_to_supercell <- function(mesh,sc_area,compactness) {
   colnames(grid.xy) <- c('X','Y')
 
   # cast grid into sf
-  grid_sf <- sf::st_cast(st_sf(geom = st_sfc(st_multipoint(as.matrix(grid.xy))), crs = st_crs(mesh)),to='POINT')
+  grid_sf <- sf::st_cast(st_sf(geom = st_sfc(st_multipoint(as.matrix(grid.xy))), crs = sf::st_crs(mesh)),to='POINT')
 
   # select only grid points within mesh area
   inter <- sf::st_intersects(grid_sf,mesh)

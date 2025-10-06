@@ -4,8 +4,8 @@
 #' to a channel centerline
 #'
 #' @param centerline An `sf` LINESTRING object representing the channel centerline.
-#' @param spacing Numeric. Longitudinal distance between transects (in CRS units).
-#' @param trans_width Numeric. Width of each transect (in CRS units).
+#' @param spacing Numeric. Longitudinal distance between transects (in CRS units). Default = 50
+#' @param trans_width Numeric. Width of each transect (in CRS units). Default = 20
 #'
 #' @return An `sf` object containing LINESTRING features for each transect.
 #'
@@ -21,7 +21,39 @@
 #' # transects <- centerline_to_transects(centerline, spacing = 50, trans_width = 20)
 #'
 #' @export
-centerline_to_transects <- function(centerline,spacing,trans_width) {
+centerline_to_transects <- function(centerline,spacing=50,trans_width=20) {
+
+  # --- Check centerline ---
+  if (!inherits(centerline, "sf")) {
+    stop("`centerline` must be an sf object.")
+  }
+  geom_type <- unique(as.character(sf::st_geometry_type(centerline)))
+  if (!any(geom_type %in% c("LINESTRING", "MULTILINESTRING"))) {
+    stop("`centerline` must contain line geometries (LINESTRING or MULTILINESTRING).")
+  }
+
+  # --- Check spacing ---
+  if (!is.numeric(spacing)) {
+    stop("`spacing` must be numeric.")
+  }
+  if (length(spacing) != 1) {
+    warning("`spacing` should be a single numeric value.")
+  }
+  if (spacing <= 0) {
+    warning("`spacing` should be positive.")
+  }
+
+  # --- Check trans_width ---
+  if (!is.numeric(trans_width)) {
+    stop("`trans_width` must be numeric.")
+  }
+  if (length(trans_width) != 1) {
+    warning("`trans_width` should be a single numeric value.")
+  }
+  if (trans_width <= 0) {
+    warning("`trans_width` should be positive.")
+  }
+
 
   # extract centerline coordinates
   centerline_coord <- sf::st_coordinates(centerline)

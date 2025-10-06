@@ -48,26 +48,25 @@ sub_codes <- data.frame(class_id = c(60,200,400),
 Process
 ```{r}
 # add refugia, connectivity, z_min and z_max to hmu shapefile
-poly_mesoHABSIM <- mesounitR::add_refugia(poly_mesohabitats, 
-                                          flow_ZDV,
-                                          poly_BOULDER=poly_boulders,
-                                          poly_CANOP_SHAD=poly_canopyshading,
-                                          poly_OVERHA_VEG=poly_overhang,
-                                          poly_ROOTS=poly_roots,
-                                          poly_SUBMER_VEG=NULL,
-                                          poly_EMERG_VEG=NULL,
-                                          poly_UNDERC_BAN=NULL,
-                                          poly_WOODY_DEBR=poly_woodydebris,
-                                          poly_RIPRAP=NULL,
-                                          poly_SHALL_MARG=NULL,
-                                          file_name='mesohabitats.shp')
+poly_mesoHABSIM <- add_refugia(poly_mesohabitats, 
+                               flow_ZDV,
+                               poly_BOULDER=poly_boulders,
+                               poly_CANOP_SHAD=poly_canopyshading,
+                               poly_OVERHA_VEG=poly_overhang,
+                               poly_ROOTS=poly_roots,
+                               poly_SUBMER_VEG=NULL,
+                               poly_EMERG_VEG=NULL,
+                               poly_UNDERC_BAN=NULL,
+                               poly_WOODY_DEBR=poly_woodydebris,
+                               poly_RIPRAP=NULL,
+                               poly_SHALL_MARG=NULL,
+                               file_name='mesohabitats.shp')
 
 # if holes in mesohabitats --> fill (optional step; simstream.web cannot handle polygons with holes)
 # if this step is applied, real extension of polygons might need to be corrected after habitat suitability computations in SIMSTREAM
-# poly_mesoHABSIM_filled <- mesounitR::fill_holes(poly_mesoHABSIM,'mesohabitats_noholes.shp')
+# poly_mesoHABSIM_filled <- smoothr::fill_holes(poly_mesoHABSIM,threshold=10000)
 
 # extract depth, velocity, substrate and save to .txt
-mesounitR::extract_DVS(poly_mesoHABSIM, flow_ZDV, ras_substrate, sub_codes, 'mesohabitats_DVS.txt')
-
+table_DVS <- extract_DVS(poly_mesoHABSIM, flow_ZDV, ras_substrate, sub_codes, 'mesohabitats_DVS.txt')
 
 ```
