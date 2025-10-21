@@ -4,6 +4,7 @@
 # mesounitR
 
 <!-- badges: start -->
+
 <!-- badges: end -->
 
 The **mesounitR** software segments a river reach into a mosaic of
@@ -53,9 +54,9 @@ pak::pak("david-faro/mesounitR")
 The following tutorials are available:
 
 - [Step-by-step tutorial on the usage of
-  mesounitR](https://github.com/david-faro/mesounitR/vignettes/tutorial-mesounitR.Rmd)
+  mesounitR](https://github.com/david-faro/mesounitR/blob/master/vignettes/tutorial-mesounitR.Rmd)
 - [integration with MesoHABSIM using Simstream-Web
-  tool](https://github.com/david-faro/mesounitR/vignettes/processing_MesoHABSIM.Rmd)
+  tool](https://github.com/david-faro/mesounitR/blob/master/vignettes/processing_MesoHABSIM.Rmd)
 
 ## Issues
 
