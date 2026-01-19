@@ -47,6 +47,9 @@ sub_codes <- data.frame(class_id = c(60,200,400),
 ```
 Process
 ```{r}
+# set seed for reproducibility of results
+set.seed(123)
+
 # add refugia, connectivity, z_min and z_max to hmu shapefile
 poly_mesoHABSIM <- add_refugia(poly_mesohabitats, 
                                flow_ZDV,

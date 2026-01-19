@@ -2,44 +2,62 @@
 #'
 #' @param poly_mesohabitats sf object of polygons representing mesohabitats
 #' @param flow sf object of mesh elements with flow data (DEPTH, VEL)
-#' @param ras_substrate stars object of substrate raster
-#' @param sub_codes data.frame with columns `class_id` and `type` for substrate classification
+#' @param depth_min numeric, minimum DEPTH to filter wet channel elements
+#' @param ras_substrate stars object of substrate raster (optional). Values set to NA if no substrate provided
+#' @param sub_codes data.frame with columns `class_id` and `type` for substrate classification (optional)
 #' @param file_name character string, path and file name to save output table. Default: 'mesohabitats_DVS.txt'
 #' @param nmax numeric, maximum number of points per HMU for subsampling (default 50)
 #'
 #' @export
 extract_DVS <- function(poly_mesohabitats,
-                        flow, ras_substrate,
-                        sub_codes,
+                        flow,
+                        depth_min,
+                        ras_substrate=NULL,
+                        sub_codes=NULL,
                         file_name='mesohabitats_DVS.txt',
                         nmax=50) {
 
   # --- 1. Check 'flow' attributes ---
   if (!all(c("DEPTH", "VEL") %in% names(flow))) {
-    stop(paste0("In 'flow' attributes 'DEPTH' and/or 'VEL' are missing."), call. = FALSE)
+    stop("In 'flow' attributes 'DEPTH' and/or 'VEL' are missing.", call. = FALSE)
   }
 
-  # --- 2. Check 'sub_codes' structure and types ---
-  required_cols <- c("class_id", "type")
-  missing_cols <- setdiff(required_cols, names(sub_codes))
-  if (length(missing_cols) > 0) {
-    stop("In 'sub_codes', required columns 'class_id' and 'type' are missing.", call. = FALSE)
+  # check that depth_min is numeric and > 0
+  if (!is.numeric(depth_min) || length(depth_min) != 1L || is.na(depth_min) || depth_min <= 0) {
+    stop("`depth_min` must be a single numeric value > 0.", call. = FALSE)
   }
 
-  # check data types
-  if (!is.numeric(sub_codes$class_id)) {
-    stop("In 'sub_codes', column 'class_id' must be of type numeric", call. = FALSE)
-  }
-  if (!is.character(sub_codes$type)) {
-    stop("In 'sub_codes', column 'type' must be of type character.", call. = FALSE)
+  # --- 2. Substrate inputs are optional ---
+  use_substrate <- !is.null(ras_substrate) && !is.null(sub_codes)
+
+  # If only one is provided, ignore substrate and warn (prevents hard-to-debug partial inputs)
+  if (xor(is.null(ras_substrate), is.null(sub_codes))) {
+    warning("Only one of `ras_substrate` / `sub_codes` was provided; `SUBSTRATE` will be set to NA.", call. = FALSE)
+    use_substrate <- FALSE
   }
 
-  # --- 3. Check that raster substrate values match sub_codes$class_id ---
-  ras_vals <- unique(as.numeric(ras_substrate[[1]]))
-  ras_vals <- ras_vals[!is.na(ras_vals)]  # drop NA values
+  if (use_substrate) {
+    # --- 2a. Check 'sub_codes' structure and types ---
+    required_cols <- c("class_id", "type")
+    missing_cols <- setdiff(required_cols, names(sub_codes))
+    if (length(missing_cols) > 0) {
+      stop("In 'sub_codes', required columns 'class_id' and 'type' are missing.", call. = FALSE)
+    }
 
-  if (!setequal(ras_vals, sub_codes$class_id)) {
-    warning("Unique values in 'ras_substrate' do not match 'sub_codes$class_id'.", call. = FALSE)
+    if (!is.numeric(sub_codes$class_id)) {
+      stop("In 'sub_codes', column 'class_id' must be of type numeric.", call. = FALSE)
+    }
+    if (!is.character(sub_codes$type)) {
+      stop("In 'sub_codes', column 'type' must be of type character.", call. = FALSE)
+    }
+
+    # --- 3. Check that raster substrate values match sub_codes$class_id ---
+    ras_vals <- unique(as.numeric(ras_substrate[[1]]))
+    ras_vals <- ras_vals[!is.na(ras_vals)]
+
+    if (!setequal(ras_vals, sub_codes$class_id)) {
+      warning("Unique values in 'ras_substrate' do not match 'sub_codes$class_id'.", call. = FALSE)
+    }
   }
 
   # --- Continue with main function body ---
@@ -60,7 +78,11 @@ extract_DVS <- function(poly_mesohabitats,
 
   # convert flow elements into points (centroids)
 
-  flow_pts <- sf::st_centroid(flow)
+  # extract only wet polygons
+  flow_wet <- flow %>%
+    filter(DEPTH >= depth_min)
+
+  flow_pts <- sf::st_centroid(flow_wet)
 
   for (i in 1:n) {
 
@@ -75,14 +97,16 @@ extract_DVS <- function(poly_mesohabitats,
     x.depth <- x.depth[!is.na(x.depth)]  # remove all NA values
     x.vel <- x.vel[!is.na(x.vel)]  # remove all NA values
 
-    # extract substrate
-    sub_in_habitat <- stars::st_extract(ras_substrate, flow_in_habitat)
-    names(sub_in_habitat)[1] <- 'sub_id'
+    # substrate: either extract, or set to NA
+    if (use_substrate) {
+      sub_in_habitat <- stars::st_extract(ras_substrate, flow_in_habitat)
+      names(sub_in_habitat)[1] <- "sub_id"
+      sub_in_habitat <- sub_in_habitat[!is.na(sub_in_habitat$sub_id), ]
 
-    sub_in_habitat <- sub_in_habitat[!is.na(sub_in_habitat$sub_id),]  # remove all NA values
-
-    # convert to substrate names
-    x.sub <- convert_substrate(sub_in_habitat$sub_id, sub_codes)
+      x.sub <- convert_substrate(sub_in_habitat$sub_id, sub_codes)
+    } else {
+      x.sub <- rep(NA_character_, min(length(x.depth), length(x.vel)))
+    }
 
     # n points
     n.pts_depth <- length(x.depth)
@@ -98,13 +122,23 @@ extract_DVS <- function(poly_mesohabitats,
 
       x.depth <- subsample_DV_to_hist(x.depth,brks,nmax)
       x.vel <- subsample_DV_to_hist(x.vel,brks,nmax)
-      x.sub <- subsample_sub_to_hist(x.sub,nmax)
+
+      if (use_substrate) {
+        x.sub <- subsample_sub_to_hist(x.sub, nmax)
+      } else {
+        x.sub <- rep(NA_character_, nmax)
+      }
 
     } else if (n.pts_max > n.pts_min) {
 
       x.depth <- subsample_DV_to_hist(x.depth,brks,n.pts_min)
       x.vel <- subsample_DV_to_hist(x.vel,brks,n.pts_min)
-      x.sub <- subsample_sub_to_hist(x.sub,n.pts_min)
+
+      if (use_substrate) {
+        x.sub <- subsample_sub_to_hist(x.sub, n.pts_min)
+      } else {
+        x.sub <- rep(NA_character_, n.pts_min)
+      }
 
     }
 
