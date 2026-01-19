@@ -74,5 +74,5 @@ the methodology and software:
   and suitability from 2D hydraulic models in gravel-bed rivers.
   Ecohydrology, 15(7), e2452. [doi:
   10.1002/eco.2452](https://doi.org/10.1002/eco.2452)
-- Vezza et al. (in review). Mesohabitat delineation in rivers using QGIS
-  and 2D hydrodynamic modeling.
+- Vezza et al. (in review). Mesohabitat delineation and modelling in
+  river channels.

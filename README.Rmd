@@ -60,4 +60,4 @@ Submitting [issues](https://github.com/david-faro/mesounitR/issues), bugs, or su
 Please refer to the following references for in-depth descriptions of the methodology and software:
 
 - Farò, D., Baumgartner, K., Vezza, P., & Zolezzi, G. (2022). A novel unsupervised method for assessing mesoscale river habitat structure and suitability from 2D hydraulic models in gravel-bed rivers. Ecohydrology, 15(7), e2452. [doi: 10.1002/eco.2452](https://doi.org/10.1002/eco.2452)
-- Vezza et al. (in review). Mesohabitat delineation in rivers using QGIS and 2D hydrodynamic modeling.
+- Vezza et al. (in review). Mesohabitat delineation and modelling in river channels.
