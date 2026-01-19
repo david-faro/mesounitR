@@ -70,6 +70,7 @@ poly_mesoHABSIM <- add_refugia(poly_mesohabitats,
 # poly_mesoHABSIM_filled <- smoothr::fill_holes(poly_mesoHABSIM,threshold=10000)
 
 # extract depth, velocity, substrate and save to .txt
-table_DVS <- extract_DVS(poly_mesoHABSIM, flow_ZDV, ras_substrate, sub_codes, 'mesohabitats_DVS.txt')
+# DEPTH and VEL values should be in m and m/s
+table_DVS <- extract_DVS(poly_mesoHABSIM, flow_ZDV, depth_min = 0.05, ras_substrate, sub_codes, 'mesohabitats_DVS.txt')
 
 ```

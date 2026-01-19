@@ -1,7 +1,7 @@
 #' Prepare Depth, Velocity, Substrate (DVS) Table for MesoHABSIM
 #'
 #' @param poly_mesohabitats sf object of polygons representing mesohabitats
-#' @param flow sf object of mesh elements with flow data (DEPTH, VEL)
+#' @param flow sf object of mesh elements with flow data (DEPTH in m, VEL in m/s)
 #' @param depth_min numeric, minimum DEPTH to filter wet channel elements
 #' @param ras_substrate stars object of substrate raster (optional). Values set to NA if no substrate provided
 #' @param sub_codes data.frame with columns `class_id` and `type` for substrate classification (optional)
