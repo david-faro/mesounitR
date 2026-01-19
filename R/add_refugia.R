@@ -72,9 +72,9 @@ add_refugia <- function(poly_mesohabitats,
   n <- nrow(poly_mesohabitats)
   poly_mesohabitats$HMU_NUM <- 1:n
 
-  # add HMU_TYPE for modelled units, if not existing already
+  # add HMU_TYPE for modelled units ('HMU'), if not existing already
   if (!'HMU_TYPE' %in% colnames(poly_mesohabitats)) {
-    poly_mesohabitats$HMU_TYPE <- 'MODELLED_UNITS'
+    poly_mesohabitats$HMU_TYPE <- 'HMU'
   }
 
   # find refugia

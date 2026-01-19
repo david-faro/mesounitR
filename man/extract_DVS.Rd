@@ -7,8 +7,9 @@
 extract_DVS(
   poly_mesohabitats,
   flow,
-  ras_substrate,
-  sub_codes,
+  depth_min,
+  ras_substrate = NULL,
+  sub_codes = NULL,
   file_name = "mesohabitats_DVS.txt",
   nmax = 50
 )
@@ -16,11 +17,13 @@ extract_DVS(
 \arguments{
 \item{poly_mesohabitats}{sf object of polygons representing mesohabitats}
 
-\item{flow}{sf object of mesh elements with flow data (DEPTH, VEL)}
+\item{flow}{sf object of mesh elements with flow data (DEPTH in m, VEL in m/s)}
 
-\item{ras_substrate}{stars object of substrate raster}
+\item{depth_min}{numeric, minimum DEPTH to filter wet channel elements}
 
-\item{sub_codes}{data.frame with columns \code{class_id} and \code{type} for substrate classification}
+\item{ras_substrate}{stars object of substrate raster (optional). Values set to NA if no substrate provided}
+
+\item{sub_codes}{data.frame with columns \code{class_id} and \code{type} for substrate classification (optional)}
 
 \item{file_name}{character string, path and file name to save output table. Default: 'mesohabitats_DVS.txt'}
 

@@ -154,7 +154,7 @@ extract_DVS <- function(poly_mesohabitats,
   }
 
   # drop rows with NA values
-  table.dvs <- na.omit(table.dvs)
+  # table.dvs <- na.omit(table.dvs)
 
   write.table(table.dvs, file_name, sep="\t", col.names = T, row.names = F, quote = F)
 
