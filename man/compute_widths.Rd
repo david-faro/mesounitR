@@ -4,15 +4,10 @@
 \alias{compute_widths}
 \title{Compute Average Channel Width from Wetted Channel Polygon}
 \usage{
-compute_widths(
-  poly_wetchannel,
-  centerline,
-  trans_longdist = 10,
-  trans_width = 300
-)
+compute_widths(channel_wet, centerline, trans_longdist = 10, trans_width = 300)
 }
 \arguments{
-\item{poly_wetchannel}{An \code{sf} POLYGON object representing the wetted channel area.}
+\item{channel_wet}{An \code{sf} POLYGON object representing the wetted channel area.}
 
 \item{centerline}{An \code{sf} LINESTRING object representing the channel centerline.}
 
@@ -37,6 +32,6 @@ transects with a polygon representing the wetted channel.
 }
 \examples{
 # Example usage:
-# avg_width <- compute_widths(poly_wetchannel, centerline, trans_longdist = 10, trans_width = 300)
+# avg_width <- compute_widths(channel_wet, centerline, trans_longdist = 10, trans_width = 300)
 
 }

@@ -4,16 +4,16 @@
 \alias{compute_optimality_metrics}
 \title{Compute Normalized Optimality Metrics (v,MI,mn) and combine into Global Score}
 \usage{
-compute_optimality_metrics(flow, flow_regions, n_range, c_paramn, A_tot)
+compute_optimality_metrics(mesh, list_units, n_range, c_params, A_tot)
 }
 \arguments{
-\item{flow}{An \code{sf} object (sfc POLYGON) representing modeled flow areas (e.g., hydraulic model elements).}
+\item{mesh}{An \code{sf} object (sfc POLYGON) representing modeled mesh areas (e.g., hydraulic model elements).}
 
-\item{flow_regions}{A list of mosaic region groupings (output from \code{supercell_to_units()}).}
+\item{list_units}{A list of mosaic region groupings (output from \code{supercell_to_units()}).}
 
 \item{n_range}{A numeric vector of unit counts associated with each mosaic.}
 
-\item{c_paramn}{A data frame containing the parameters W_area, c_logmean and c_logsd}
+\item{c_params}{A data frame containing the parameters W_area, c_logmean and c_logsd}
 
 \item{A_tot}{A numeric vector with the total (wetted) channel area}
 }
@@ -39,7 +39,7 @@ them into a Global Score (GS).
 }
 }
 \examples{
-# Assuming 'flow', 'flow_regions', 'n_range', and other parameters are defined:
-# scores <- compute_optimality_metrics(flow, flow_regions, n_range, W_area, c_logmean, c_logsd)
+# Assuming 'mesh', 'list_units', 'n_range', and other parameters are defined:
+# scores <- compute_optimality_metrics(mesh, list_units, n_range, W_area, c_logmean, c_logsd)
 
 }

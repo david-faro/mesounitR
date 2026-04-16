@@ -4,10 +4,10 @@
 \alias{optimal_n}
 \title{Identify Optimal 'n' Value Based on Global Score (GS)}
 \usage{
-optimal_n(optimal_metrics)
+optimal_n(optimality_metrics)
 }
 \arguments{
-\item{optimal_metrics}{A list or data structure containing:
+\item{optimality_metrics}{A list or data structure containing:
 \describe{
 \item{GS}{A numeric vector of GS values.}
 \item{n}{A vector of associated parameter values for \code{n}.}
@@ -30,7 +30,7 @@ The function identifies the index of the minimum \code{GS} value and returns the
 \examples{
 gs_values <- c(0.3, 0.2, 0.15, 0.25)
 n_values <- seq(1, 4)
-optimal_metrics <- data.frame(GS = gs_values, n = n_values)
-optimal_n(optimal_metrics)
+optimality_metrics <- data.frame(GS = gs_values, n = n_values)
+optimal_n(optimality_metrics)
 
 }

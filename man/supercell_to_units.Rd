@@ -4,16 +4,16 @@
 \alias{supercell_to_units}
 \title{Regionalize supercells into mosaic of n units Using SKATER Algorithm}
 \usage{
-supercell_to_units(mesh_supercell, range_n)
+supercell_to_units(supercells, n_range)
 }
 \arguments{
-\item{mesh_supercell}{A \code{sf} object containing polygons (supercells) with at least columns \code{D_avg} and \code{V_avg}
+\item{supercells}{A \code{sf} object containing polygons (supercells) with at least columns \code{D_avg} and \code{V_avg}
 representing average depth and velocity, respectively.}
 
-\item{range_n}{A numeric vector specifying the target number of regions for each SKATER run.}
+\item{n_range}{A numeric vector specifying the target number of regions for each SKATER run.}
 }
 \value{
-A list of \code{sf} objects, each representing a segmentation into \code{n} spatial units (as defined in \code{range_n}),
+A list of \code{sf} objects, each representing a segmentation into \code{n} spatial units (as defined in \code{n_range}),
 with recalculated average depth (\code{D_avg}) and velocity (\code{V_avg}) for each unit.
 }
 \description{

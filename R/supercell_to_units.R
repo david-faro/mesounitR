@@ -4,11 +4,11 @@
 #' This function segments a mesh of supercells into spatial units based on
 #' average depth and velocity attributes.
 #'
-#' @param mesh_supercell A `sf` object containing polygons (supercells) with at least columns `D_avg` and `V_avg`
+#' @param supercells A `sf` object containing polygons (supercells) with at least columns `D_avg` and `V_avg`
 #'   representing average depth and velocity, respectively.
-#' @param range_n A numeric vector specifying the target number of regions for each SKATER run.
+#' @param n_range A numeric vector specifying the target number of regions for each SKATER run.
 #'
-#' @return A list of `sf` objects, each representing a segmentation into `n` spatial units (as defined in `range_n`),
+#' @return A list of `sf` objects, each representing a segmentation into `n` spatial units (as defined in `n_range`),
 #'   with recalculated average depth (`D_avg`) and velocity (`V_avg`) for each unit.
 #'
 #' @details The function performs the following steps:
@@ -26,61 +26,61 @@
 #'
 #' @export
 
-supercell_to_units <- function(mesh_supercell,range_n) {
+supercell_to_units <- function(supercells,n_range) {
 
-  # --- Check mesh_supercell ---
-  if (!inherits(mesh_supercell, "sf")) {
-    stop("`mesh_supercell` must be an sf object.")
+  # --- Check supercells ---
+  if (!inherits(supercells, "sf")) {
+    stop("`supercells` must be an sf object.")
   }
-  geom_type <- unique(as.character(sf::st_geometry_type(mesh_supercell)))
+  geom_type <- unique(as.character(sf::st_geometry_type(supercells)))
   if (!any(geom_type %in% c("POLYGON", "MULTIPOLYGON"))) {
-    stop("`mesh_supercell` must contain polygon geometries (POLYGON or MULTIPOLYGON).")
+    stop("`supercells` must contain polygon geometries (POLYGON or MULTIPOLYGON).")
   }
-  if (nrow(mesh_supercell) == 0) {
-    stop("`mesh_supercell` cannot be empty.")
+  if (nrow(supercells) == 0) {
+    stop("`supercells` cannot be empty.")
   }
 
-  # --- Check range_n ---
-  if (!is.numeric(range_n)) {
-    stop("`range_n` must be numeric.")
+  # --- Check n_range ---
+  if (!is.numeric(n_range)) {
+    stop("`n_range` must be numeric.")
   }
-  if (length(range_n) == 0) {
-    stop("`range_n` cannot be empty.")
+  if (length(n_range) == 0) {
+    stop("`n_range` cannot be empty.")
   }
-  if (any(is.na(range_n))) {
-    warning("`range_n` contains NA values.")
+  if (any(is.na(n_range))) {
+    warning("`n_range` contains NA values.")
   }
-  if (any(range_n %% 1 != 0)) {
-    stop("`range_n` must contain integer values (whole numbers).")
+  if (any(n_range %% 1 != 0)) {
+    stop("`n_range` must contain integer values (whole numbers).")
   }
 
   #### main function body ####
 
   #### select only relevant variables
-  mesh_supercell_sub <- mesh_supercell[,c('D_avg','V_avg')] # for now working only with predefined variables (average depth and vel)
+  supercells_sub <- supercells[,c('D_avg','V_avg')] # for now working only with predefined variables (average depth and vel)
 
   #### compute weights
-  nb <- spdep::poly2nb(mesh_supercell_sub,queen=T)
+  nb <- spdep::poly2nb(supercells_sub,queen=T)
 
   # scale variables for regionalization
-  mesh_supercell_scaled <- mesh_supercell_sub %>%
+  supercells_scaled <- supercells_sub %>%
     sf::st_drop_geometry() %>%
     mutate(D_avg = scale(D_avg), # average depth
            V_avg = scale(V_avg)) # average velocity
 
-  costs <- spdep::nbcosts(nb,data=mesh_supercell_scaled)
+  costs <- spdep::nbcosts(nb,data=supercells_scaled)
   w <- spdep::nb2listw(nb,costs,style="B")
 
   mst <- spdep::mstree(w)
 
   mesh_clustered <- list()
 
-  # segment using skater algorithm. ncuts defined based on range_n variable
-  for (i in 1:length(range_n)) {
+  # segment using skater algorithm. ncuts defined based on n_range variable
+  for (i in 1:length(n_range)) {
 
-    clusters <- spdep::skater(edges=mst,data=mesh_supercell_scaled,ncuts=range_n[i]-1)
+    clusters <- spdep::skater(edges=mst,data=supercells_scaled,ncuts=n_range[i]-1)
 
-    mesh_clustered[[i]] <- cbind(mesh_supercell_sub,
+    mesh_clustered[[i]] <- cbind(supercells_sub,
                                  data.frame(cluster=clusters$groups)) %>%
       group_by(cluster) %>%
       summarise(D_avg = mean(D_avg),

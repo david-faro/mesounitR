@@ -3,7 +3,7 @@
 #' This function calculates the average channel width by intersecting evenly spaced
 #' transects with a polygon representing the wetted channel.
 #'
-#' @param poly_wetchannel An `sf` POLYGON object representing the wetted channel area.
+#' @param channel_wet An `sf` POLYGON object representing the wetted channel area.
 #' @param centerline An `sf` LINESTRING object representing the channel centerline.
 #' @param trans_longdist Numeric. Longitudinal spacing between transects (default is 10, in CRS units).
 #' @param trans_width Numeric. Width of transects to extend on either side of the centerline
@@ -18,23 +18,23 @@
 #'
 #' @examples
 #' # Example usage:
-#' # avg_width <- compute_widths(poly_wetchannel, centerline, trans_longdist = 10, trans_width = 300)
+#' # avg_width <- compute_widths(channel_wet, centerline, trans_longdist = 10, trans_width = 300)
 #'
 #' @export
-compute_widths <- function(poly_wetchannel,centerline,trans_longdist=10,trans_width=300) {
+compute_widths <- function(channel_wet,centerline,trans_longdist=10,trans_width=300) {
 
-  # --- Check poly_wetchannel ---
-  if (!inherits(poly_wetchannel, "sf")) {
-    stop("`poly_wetchannel` must be an sf object.")
+  # --- Check channel_wet ---
+  if (!inherits(channel_wet, "sf")) {
+    stop("`channel_wet` must be an sf object.")
   }
 
-  geom_type <- unique(as.character(sf::st_geometry_type(poly_wetchannel)))
+  geom_type <- unique(as.character(sf::st_geometry_type(channel_wet)))
   if (!any(geom_type %in% c("POLYGON", "MULTIPOLYGON"))) {
-    stop("`poly_wetchannel` must contain polygon geometries (POLYGON or MULTIPOLYGON).")
+    stop("`channel_wet` must contain polygon geometries (POLYGON or MULTIPOLYGON).")
   }
 
-  if (nrow(poly_wetchannel) > 1) {
-    warning("`poly_wetchannel` contains more than one polygon - only the first may be used.")
+  if (nrow(channel_wet) > 1) {
+    warning("`channel_wet` contains more than one polygon - only the first may be used.")
   }
 
   # --- Check centerline ---
@@ -69,7 +69,7 @@ compute_widths <- function(poly_wetchannel,centerline,trans_longdist=10,trans_wi
   transects <- centerline_to_transects(centerline,trans_longdist,trans_width)
 
   # Intersect transects with the wetted channel polygon
-  trans_inters <- st_intersection(st_make_valid(poly_wetchannel),transects)
+  trans_inters <- st_intersection(st_make_valid(channel_wet),transects)
 
   # Compute width as the length of each intersected segment
   widths <- as.numeric(st_length(trans_inters))

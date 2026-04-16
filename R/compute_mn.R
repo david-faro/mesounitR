@@ -92,7 +92,6 @@ compute_mn <- function(
   # Compute mn index for each probable area
 
   index <- abs(n_prob$A - A_tot) / A_tot
-  index[index >= 1] <- 1
 
   n_prob$index <- index
 
@@ -100,6 +99,9 @@ compute_mn <- function(
   n_summary <- n_prob %>%
     dplyr::group_by(n) %>%
     dplyr::summarise(mn = mean(index), .groups = "drop")
+
+  # bound mn values to [0,1]
+  n_summary$mn[n_summary$mn >= 1] <- 1
 
   return(n_summary)
 }

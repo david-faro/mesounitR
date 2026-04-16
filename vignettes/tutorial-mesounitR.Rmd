@@ -62,9 +62,9 @@ hmu_map <- st_read('data_tutorial1/survey_hmu.shp')
 
 ## dissolve flow_wet or surveyed HMU polygons into 1 polygon for the wetted channel
 # adjust max_hole_area if needed
-channel_wet <- flow_to_wetchannel(hmu_map,max_hole_area = 20)
+channel_wet <- flow_to_wetchannel(hmu_map,max_hole_area = 20) # using flow_wet, since modelled area larger than surveyed one
 
-# alternatively: use flow_wet if discharge same as surveyed hmu
+# alternatively: use flow_wet if reach extent and discharge same as that of surveyed hmu
 # channel_wet <- flow_to_wetchannel(flow_wet,max_hole_area = 20)
 
 ## compute average wetted channel width
@@ -114,6 +114,15 @@ Compute optimality metrics (v,MI,ms) and the derived Global Score (GS)
 ```{r}
 # compute wetted channel area of modelled reach
 A_tot <- as.numeric(sum(st_area(flow_wet)))
+
+# update channel width and W_area based on modelled reach
+channel_wet <- flow_to_wetchannel(flow_wet,max_hole_area = 20)
+
+## compute average wetted channel width
+# adjust parameters trans_longidst and trans_width if needed
+W <- compute_widths(channel_wet,centerline,20,300)
+
+c_params$W_area <- W^2
 
 # compute optimality metrics
 optimality_metrics <- compute_optimality_metrics(flow_wet,list_units,n_range,c_params,A_tot)

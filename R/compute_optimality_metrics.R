@@ -3,10 +3,10 @@
 #' This function calculates three normalized optimality metrics, the Moran's I (MI), weighted averaged variance (v), and meso-number index (mn), for a list of mosaic regions and combines
 #' them into a Global Score (GS).
 #'
-#' @param flow An `sf` object (sfc POLYGON) representing modeled flow areas (e.g., hydraulic model elements).
-#' @param flow_regions A list of mosaic region groupings (output from `supercell_to_units()`).
+#' @param mesh An `sf` object (sfc POLYGON) representing modeled mesh areas (e.g., hydraulic model elements).
+#' @param list_units A list of mosaic region groupings (output from `supercell_to_units()`).
 #' @param n_range A numeric vector of unit counts associated with each mosaic.
-#' @param c_paramn A data frame containing the parameters W_area, c_logmean and c_logsd
+#' @param c_params A data frame containing the parameters W_area, c_logmean and c_logsd
 #' @param A_tot A numeric vector with the total (wetted) channel area
 #'
 #' @return A data frame containing:
@@ -24,41 +24,41 @@
 #' - All three metrics are normalized using `sp_norm()` and combined into a global performance score (GS).
 #'
 #' @examples
-#' # Assuming 'flow', 'flow_regions', 'n_range', and other parameters are defined:
-#' # scores <- compute_optimality_metrics(flow, flow_regions, n_range, W_area, c_logmean, c_logsd)
+#' # Assuming 'mesh', 'list_units', 'n_range', and other parameters are defined:
+#' # scores <- compute_optimality_metrics(mesh, list_units, n_range, W_area, c_logmean, c_logsd)
 #'
 #' @export
-compute_optimality_metrics <- function(flow, flow_regions,n_range,c_paramn,A_tot) {
+compute_optimality_metrics <- function(mesh, list_units,n_range,c_params,A_tot) {
 
-  # --- Check flow ---
-  if (!inherits(flow, "sf")) {
-    stop("`flow` must be an sf object.")
+  # --- Check mesh ---
+  if (!inherits(mesh, "sf")) {
+    stop("`mesh` must be an sf object.")
   }
-  geom_type <- unique(as.character(sf::st_geometry_type(flow)))
+  geom_type <- unique(as.character(sf::st_geometry_type(mesh)))
   if (!any(geom_type %in% c("POLYGON", "MULTIPOLYGON"))) {
-    stop("`flow` must contain polygon geometries (POLYGON or MULTIPOLYGON).")
+    stop("`mesh` must contain polygon geometries (POLYGON or MULTIPOLYGON).")
   }
-  if (nrow(flow) == 0) {
-    stop("`flow` cannot be empty.")
+  if (nrow(mesh) == 0) {
+    stop("`mesh` cannot be empty.")
   }
   required_cols <- c("DEPTH", "VEL")
-  missing_cols <- setdiff(required_cols, names(flow))
+  missing_cols <- setdiff(required_cols, names(mesh))
   if (length(missing_cols) > 0) {
-    stop(paste0("`flow` is missing required attribute(s): ", paste(missing_cols, collapse = ", ")))
+    stop(paste0("`mesh` is missing required attribute(s): ", paste(missing_cols, collapse = ", ")))
   }
 
-  # --- Check flow_regions ---
-  if (!is.list(flow_regions)) {
-    stop("`flow_regions` must be a list.")
+  # --- Check list_units ---
+  if (!is.list(list_units)) {
+    stop("`list_units` must be a list.")
   }
-  if (length(flow_regions) == 0) {
-    stop("`flow_regions` must contain at least one element.")
+  if (length(list_units) == 0) {
+    stop("`list_units` must contain at least one element.")
   }
-  is_sf_poly <- sapply(flow_regions, function(x) {
+  is_sf_poly <- sapply(list_units, function(x) {
     inherits(x, "sf") && any(sf::st_geometry_type(x) %in% c("POLYGON", "MULTIPOLYGON"))
   })
   if (!any(is_sf_poly)) {
-    stop("`flow_regions` must contain at least one 'sf' polygon object.")
+    stop("`list_units` must contain at least one 'sf' polygon object.")
   }
 
   # --- Check n_range ---
@@ -73,19 +73,19 @@ compute_optimality_metrics <- function(flow, flow_regions,n_range,c_paramn,A_tot
   }
   if (any(n_range %% 1 != 0)) {stop("`n_range` must be an integer value (whole number).")}
 
-  # --- Check c_paramn ---
-  if (!is.data.frame(c_paramn)) {
-    stop("`c_paramn` must be a data.frame.")
+  # --- Check c_params ---
+  if (!is.data.frame(c_params)) {
+    stop("`c_params` must be a data.frame.")
   }
   required_cols <- c("W_area", "c_logmean", "c_logsd")
-  missing_cols <- setdiff(required_cols, names(c_paramn))
+  missing_cols <- setdiff(required_cols, names(c_params))
   if (length(missing_cols) > 0) {
-    stop(paste0("`c_paramn` is missing required column(s): ", paste(missing_cols, collapse = ", ")))
+    stop(paste0("`c_params` is missing required column(s): ", paste(missing_cols, collapse = ", ")))
   }
   # Verify values are numeric and > 0
-  non_numeric <- !sapply(c_paramn[required_cols], is.numeric)
+  non_numeric <- !sapply(c_params[required_cols], is.numeric)
   if (any(non_numeric)) {
-    stop(paste0("The following columns in `c_paramn` must be numeric: ",
+    stop(paste0("The following columns in `c_params` must be numeric: ",
                 paste(required_cols[non_numeric], collapse = ", ")))
   }
 
@@ -99,23 +99,23 @@ compute_optimality_metrics <- function(flow, flow_regions,n_range,c_paramn,A_tot
 
   #### continue with main function body ####
 
-  W_area <- c_paramn$W_area
-  c_logmean <- c_paramn$c_logmean
-  c_logsd <- c_paramn$c_logsd
+  W_area <- c_params$W_area
+  c_logmean <- c_params$c_logmean
+  c_logsd <- c_params$c_logsd
 
   # Initialize metric vectors
   MI <- numeric()
   v <- numeric()
 
   # extract centroids from polygons
-  flow_pts <- sf::st_centroid(flow)
+  mesh_pts <- sf::st_centroid(mesh)
 
   # compute MI and v for each mosaic
   for (i in 1:length(n_range)) {
 
-    regions_i <- flow_regions[[i]]
+    regions_i <- list_units[[i]]
 
-    indicator <- segmentation_indicators(regions_i,flow_pts,"VEL")
+    indicator <- segmentation_indicators(regions_i,mesh_pts,"VEL")
 
     MI[i] <- indicator$MI
     v[i] <- indicator$v

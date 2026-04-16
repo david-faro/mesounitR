@@ -4,10 +4,10 @@
 \alias{plot_segmentation_indicators}
 \title{Plot Segmentation Indicators}
 \usage{
-plot_segmentation_indicators(optimal_metrics)
+plot_segmentation_indicators(optimality_metrics)
 }
 \arguments{
-\item{optimal_metrics}{A data frame returned by \code{compute.optmetrics()}, containing
+\item{optimality_metrics}{A data frame returned by \code{compute.optmetrics()}, containing
 normalized indicators with one column named \code{n} and additional columns for each metric
 (e.g., \code{MI}, \code{v}, \code{mn}, \code{GS}).}
 }
@@ -25,8 +25,8 @@ while other indicators are shown in gray with different line types.
 }
 \examples{
 \dontrun{
-optimal_metrics <- compute.optmetrics(...)  # assuming output contains 'n', 'MI', 'v', 'mn', 'GS'
-plot_segmentation_indicators(optimal_metrics)
+optimality_metrics <- compute.optmetrics(...)  # assuming output contains 'n', 'MI', 'v', 'mn', 'GS'
+plot_segmentation_indicators(optimality_metrics)
 }
 
 }

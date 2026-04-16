@@ -3,7 +3,7 @@
 #' Visualizes segmentation quality indicators (e.g., MI, v, mn, GS) across different values of `n`
 #' from an object produced by `compute.optmetrics()`.
 #'
-#' @param optimal_metrics A data frame returned by `compute.optmetrics()`, containing
+#' @param optimality_metrics A data frame returned by `compute.optmetrics()`, containing
 #' normalized indicators with one column named `n` and additional columns for each metric
 #' (e.g., `MI`, `v`, `mn`, `GS`).
 #'
@@ -16,35 +16,35 @@
 #'
 #' @examples
 #' \dontrun{
-#' optimal_metrics <- compute.optmetrics(...)  # assuming output contains 'n', 'MI', 'v', 'mn', 'GS'
-#' plot_segmentation_indicators(optimal_metrics)
+#' optimality_metrics <- compute.optmetrics(...)  # assuming output contains 'n', 'MI', 'v', 'mn', 'GS'
+#' plot_segmentation_indicators(optimality_metrics)
 #' }
 #'
 #' @export
 
-plot_segmentation_indicators <- function(optimal_metrics) {
+plot_segmentation_indicators <- function(optimality_metrics) {
 
   # --- Check object type ---
-  if (!is.data.frame(optimal_metrics)) {
-    stop("`optimal_metrics` must be a data.frame.")
+  if (!is.data.frame(optimality_metrics)) {
+    stop("`optimality_metrics` must be a data.frame.")
   }
 
   # --- Check required columns ---
   required_cols <- c("n", "MI", "v", "mn", "GS")
-  missing_cols <- setdiff(required_cols, names(optimal_metrics))
+  missing_cols <- setdiff(required_cols, names(optimality_metrics))
   if (length(missing_cols) > 0) {
-    stop(paste0("`optimal_metrics` is missing required column(s): ",
+    stop(paste0("`optimality_metrics` is missing required column(s): ",
                 paste(missing_cols, collapse = ", ")))
   }
 
   # --- Optional: warn if empty ---
-  if (nrow(optimal_metrics) == 0) {
-    warning("`optimal_metrics` is empty.")
+  if (nrow(optimality_metrics) == 0) {
+    warning("`optimality_metrics` is empty.")
   }
 
   #### main function body ####
 
-  p <- optimal_metrics %>%
+  p <- optimality_metrics %>%
     tidyr::pivot_longer(cols=c('MI','v','mn','GS'),values_to='value',names_to='variable') %>%
     mutate(variable = factor(variable,levels = c('MI','v','mn','GS'))) %>%
     ggplot2::ggplot(aes(x=n,y=value,color=variable,linetype=variable)) +
