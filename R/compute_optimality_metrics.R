@@ -73,6 +73,12 @@ compute_optimality_metrics <- function(mesh, list_units,n_range,c_params,A_tot) 
   }
   if (any(n_range %% 1 != 0)) {stop("`n_range` must be an integer value (whole number).")}
 
+  if (any(n_range == 1)) {
+
+    stop("only mosaics with >= 2 units can evaluated")
+
+  }
+
   # --- Check c_params ---
   if (!is.data.frame(c_params)) {
     stop("`c_params` must be a data.frame.")

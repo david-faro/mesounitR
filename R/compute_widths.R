@@ -69,10 +69,32 @@ compute_widths <- function(channel_wet,centerline,trans_longdist=10,trans_width=
   transects <- centerline_to_transects(centerline,trans_longdist,trans_width)
 
   # Intersect transects with the wetted channel polygon
-  trans_inters <- st_intersection(st_make_valid(channel_wet),transects)
+  trans_inters <- st_intersection(st_make_valid(channel_wet), transects)
+
+  # Split into separate LINESTRING features
+
+  out_list <- list()
+
+  k <- 1
+
+  for (i in seq_len(nrow(trans_inters))) {
+
+    geom_i <- trans_inters[i, ]
+
+    if (length(st_geometry(geom_i)) == 0 || st_is_empty(geom_i)) next
+
+    cast_i <- st_cast(geom_i, "LINESTRING", warn = FALSE)
+
+    out_list[[k]] <- cast_i
+
+    k <- k + 1
+
+  }
+
+  trans_cast_all <- do.call(rbind, out_list)
 
   # Compute width as the length of each intersected segment
-  widths <- as.numeric(st_length(trans_inters))
+  widths <- as.numeric(st_length(trans_cast_all))
 
   # plot transects
   plot(trans_inters)

@@ -98,9 +98,9 @@ step 2) regionalize superpixels to a mosaic composed of n units using SKATER spa
 ```{r}
 #### define computation range
 # number of potential regions in computed mosaics ranges from n_min to n_max, with increments defined by n_by
-n_min <- 10
-n_max <- 100
-n_by <- 15
+n_min <- 5
+n_max <- 65
+n_by <- 10
 
 n_range <- seq(from=n_min,to=n_max,by=n_by)
 
@@ -143,7 +143,7 @@ print(paste0('optimal n is ',opt_n$n))
 step 2 bis) Refine GS curve, by adding additional mosaics with n units to the list
 ```{r}
 # add mosaics with n units defined in n_range_toadd 
-n_range_toadd <- seq(35,37,by=1)
+n_range_toadd <- c(23,24,26,27,28,29)
 
 list_units_old <- list_units
 add_units_results <- add_units(list_units_old,supercells,n_range_toadd)

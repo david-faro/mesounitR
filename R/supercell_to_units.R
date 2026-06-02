@@ -56,37 +56,62 @@ supercell_to_units <- function(supercells,n_range) {
 
   #### main function body ####
 
-  #### select only relevant variables
-  supercells_sub <- supercells[,c('D_avg','V_avg')] # for now working only with predefined variables (average depth and vel)
+  supercells_sub <- supercells[, c("D_avg", "V_avg")]
 
-  #### compute weights
-  nb <- spdep::poly2nb(supercells_sub,queen=T)
+  message("Computing weights...")
 
-  # scale variables for regionalization
+  nb <- spdep::poly2nb(supercells_sub, queen = TRUE)
+
   supercells_scaled <- supercells_sub %>%
     sf::st_drop_geometry() %>%
-    mutate(D_avg = scale(D_avg), # average depth
-           V_avg = scale(V_avg)) # average velocity
+    mutate(
+      D_avg = scale(D_avg),
+      V_avg = scale(V_avg)
+    )
 
-  costs <- spdep::nbcosts(nb,data=supercells_scaled)
-  w <- spdep::nb2listw(nb,costs,style="B")
+  costs <- spdep::nbcosts(nb, data = supercells_scaled)
+  w <- spdep::nb2listw(nb, costs, style = "B")
 
   mst <- spdep::mstree(w)
 
-  mesh_clustered <- list()
+  message("Weights computation done.")
 
-  # segment using skater algorithm. ncuts defined based on n_range variable
-  for (i in 1:length(n_range)) {
+  mesh_clustered <- vector("list", length(n_range))
 
-    clusters <- spdep::skater(edges=mst,data=supercells_scaled,ncuts=n_range[i]-1)
+  message("Segmentation with SKATER algorithm started...")
 
-    mesh_clustered[[i]] <- cbind(supercells_sub,
-                                 data.frame(cluster=clusters$groups)) %>%
-      group_by(cluster) %>%
-      summarise(D_avg = mean(D_avg),
-                V_avg = mean(V_avg))
+  pb <- progress::progress_bar$new(
+    format = "  SKATER [:bar] :current/:total (:percent) ETA: :eta",
+    total = length(n_range),
+    clear = FALSE,
+    width = 60,
+    show_after = 0
+  )
 
+  pb$tick(0)
+
+  for (i in seq_along(n_range)) {
+
+    clusters <- spdep::skater(
+      edges = mst,
+      data = supercells_scaled,
+      ncuts = n_range[i] - 1
+    )
+
+    mesh_clustered[[i]] <- cbind(
+      supercells_sub,
+      data.frame(cluster = clusters$groups)
+    ) %>%
+      dplyr::group_by(cluster) %>%
+      dplyr::summarise(
+        D_avg = mean(D_avg),
+        V_avg = mean(V_avg)
+      )
+
+    pb$tick()
   }
+
+  message("Segmentation done.")
 
   return(mesh_clustered)
 

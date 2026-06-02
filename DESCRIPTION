@@ -19,7 +19,8 @@ Imports:
     ClusterR,
     ggplot2,
     nngeo,
-    stars
+    stars,
+    progress
 Suggests: 
     knitr,
     rmarkdown
