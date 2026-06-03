@@ -4,10 +4,12 @@
 \alias{add_units}
 \title{Add Unit Mosaics to an Existing List of Units}
 \usage{
-add_units(list_units_old, supercells, n_range_toadd)
+add_units(list_units_old, skater_res, supercells, n_range_toadd)
 }
 \arguments{
 \item{list_units_old}{A list of existing unit mosaics, each being a data.frame or similar object.}
+
+\item{skater_res}{Object created from skater_allcuts function}
 
 \item{supercells}{An object containing the supercell structure used to generate new unit mosaics.}
 

@@ -13,8 +13,10 @@ representing average depth and velocity, respectively.}
 \item{n_range}{A numeric vector specifying the target number of regions for each SKATER run.}
 }
 \value{
-A list of \code{sf} objects, each representing a segmentation into \code{n} spatial units (as defined in \code{n_range}),
-with recalculated average depth (\code{D_avg}) and velocity (\code{V_avg}) for each unit.
+A list of:
+\enumerate{
+\item{skater_res} object returned from skater segmentation
+\item{list_units} list of \code{sf} objects, each representing a segmentation into \code{n} spatial units (as defined in \code{n_range})
 }
 \description{
 Applies spatial regionalization to supercell polygons using the SKATER algorithm.
