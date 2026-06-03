@@ -8,8 +8,10 @@
 #'   representing average depth and velocity, respectively.
 #' @param n_range A numeric vector specifying the target number of regions for each SKATER run.
 #'
-#' @return A list of `sf` objects, each representing a segmentation into `n` spatial units (as defined in `n_range`),
-#'   with recalculated average depth (`D_avg`) and velocity (`V_avg`) for each unit.
+#' @return A list of:
+#' \enumerate{
+#'  \item{skater_res} object returned from skater segmentation
+#'  \item{list_units} list of `sf` objects, each representing a segmentation into `n` spatial units (as defined in `n_range`)
 #'
 #' @details The function performs the following steps:
 #' \enumerate{
@@ -25,7 +27,6 @@
 #' @importFrom spdep poly2nb nbcosts nb2listw mstree skater set.coresOption set.mcOption set.ClusterOption get.coresOption
 #'
 #' @export
-
 supercell_to_units <- function(supercells,n_range) {
 
   # --- Check supercells ---
@@ -58,8 +59,6 @@ supercell_to_units <- function(supercells,n_range) {
 
   supercells_sub <- supercells[, c("D_avg", "V_avg")]
 
-  message("Computing weights...")
-
   nb <- spdep::poly2nb(supercells_sub, queen = TRUE)
 
   supercells_scaled <- supercells_sub %>%
@@ -74,45 +73,11 @@ supercell_to_units <- function(supercells,n_range) {
 
   mst <- spdep::mstree(w)
 
-  message("Weights computation done.")
+  skater_res <- skater_allcuts(mst, supercells_scaled)
 
-  mesh_clustered <- vector("list", length(n_range))
+  mesh_clustered <- create_nmosaic(supercells, skater_res, n_range)
 
-  message("Segmentation with SKATER algorithm started...")
-
-  pb <- progress::progress_bar$new(
-    format = "  SKATER [:bar] :current/:total (:percent) ETA: :eta",
-    total = length(n_range),
-    clear = FALSE,
-    width = 60,
-    show_after = 0
-  )
-
-  pb$tick(0)
-
-  for (i in seq_along(n_range)) {
-
-    clusters <- spdep::skater(
-      edges = mst,
-      data = supercells_scaled,
-      ncuts = n_range[i] - 1
-    )
-
-    mesh_clustered[[i]] <- cbind(
-      supercells_sub,
-      data.frame(cluster = clusters$groups)
-    ) %>%
-      dplyr::group_by(cluster) %>%
-      dplyr::summarise(
-        D_avg = mean(D_avg),
-        V_avg = mean(V_avg)
-      )
-
-    pb$tick()
-  }
-
-  message("Segmentation done.")
-
-  return(mesh_clustered)
+  return(list(skater_res=skater_res,
+              list_units=mesh_clustered))
 
 }

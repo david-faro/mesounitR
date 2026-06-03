@@ -4,6 +4,7 @@
 #' generated from supercells based on a specified range of unit sizes.
 #'
 #' @param list_units_old A list of existing unit mosaics, each being a data.frame or similar object.
+#' @param skater_res Object created from skater_allcuts function
 #' @param supercells An object containing the supercell structure used to generate new unit mosaics.
 #' @param n_range_toadd A numeric vector indicating the sizes of new units to add from the supercells.
 #'
@@ -19,7 +20,7 @@
 #'
 #' @export
 #'
-add_units <- function(list_units_old,supercells,n_range_toadd) {
+add_units <- function(list_units_old,skater_res,supercells,n_range_toadd) {
 
   # --- Check list_units_old ---
   if (!is.list(list_units_old)) {
@@ -34,6 +35,20 @@ add_units <- function(list_units_old,supercells,n_range_toadd) {
   })
   if (!any(is_sf_poly)) {
     stop("`list_units_old` must contain at least one 'sf' polygon object.")
+  }
+
+  # --- Check skater_res ---
+
+  if (!inherits(skater_res, "skater")) {
+    stop("`skater_res` must be of class 'skater'.")
+  }
+
+  if (!is.list(skater_res) || is.null(skater_res$groups.history)) {
+    stop("`skater_res` must contain a matrix named `groups.history`.")
+  }
+
+  if (!is.matrix(skater_res$groups.history)) {
+    stop("`skater_res$groups.history` must be a matrix.")
   }
 
   # --- Check supercells ---
@@ -73,7 +88,7 @@ add_units <- function(list_units_old,supercells,n_range_toadd) {
   n_range_new <- n_range_toadd[ ! n_range_toadd %in% n_range_old ]
 
   # Generate new units mosaics based on then n's defined in n_range_toadd
-  list_units_toadd <- supercell_to_units(supercells,n_range_new)
+  list_units_toadd <- create_nmosaic(supercells,skater_res,n_range_new)
 
   # Combine old and new mosaics lists
   list_units <- c(list_units_old,list_units_toadd)
