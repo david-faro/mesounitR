@@ -34,6 +34,9 @@ elements_to_supercell <- function(mesh,sc_area,compactness) {
   if (!is.numeric(compactness) || compactness <= 0) stop("`compactness` must be a positive numeric value.")
   if (nrow(mesh) < 2) stop("`mesh` must contain at least two features for clustering.")
 
+  # set seed
+  set.seed(123)
+
   # mesh into points
   mesh_pts <- st_centroid(mesh)
 

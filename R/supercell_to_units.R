@@ -56,6 +56,9 @@ supercell_to_units <- function(supercells,n_range) {
     stop("`n_range` must contain integer values (whole numbers).")
   }
 
+  # set seed
+  set.seed(123)
+
   #### main function body ####
 
   supercells_sub <- supercells[, c("D_avg", "V_avg")]

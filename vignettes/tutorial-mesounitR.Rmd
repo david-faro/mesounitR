@@ -140,7 +140,7 @@ opt_units <- list_units[[opt_n$i]]
 print(paste0('optimal n is ',opt_n$n))
 
 # write optimal shp
-st_write(opt_units,paste0('optimal_mosaic_n',opt_n$n,'.shp'),delete_dsn=T)
+# st_write(opt_units,paste0('optimal_mosaic_n',opt_n$n,'.shp'),delete_dsn=T)
 ```
 
 
