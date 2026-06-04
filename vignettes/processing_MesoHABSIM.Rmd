@@ -21,7 +21,7 @@ library(stars)
 library(ggplot2)
 library(dplyr)
 library(mesounitR)
-library(smoothr)
+#library(smoothr)
 ```
 
 Load data

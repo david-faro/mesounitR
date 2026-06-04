@@ -13,7 +13,8 @@
 #'  \item{skater_res} object returned from skater segmentation
 #'  \item{list_units} list of `sf` objects, each representing a segmentation into `n` spatial units (as defined in `n_range`)
 #'
-#' @details The function performs the following steps:
+#' @details
+#' The function performs the following steps:
 #' \enumerate{
 #'   \item Selects relevant variables (`D_avg`, `V_avg`).
 #'   \item Builds neighbor relationships using `poly2nb()`.

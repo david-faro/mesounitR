@@ -69,10 +69,10 @@ channel_wet <- flow_to_wetchannel(hmu_map,max_hole_area = 20) # using flow_wet, 
 
 ## compute average wetted channel width
 # adjust parameters trans_longidst and trans_width if needed
-W <- compute_widths(channel_wet,centerline,20,300)
+W_emp <- compute_widths(channel_wet,centerline,20,300)
 
 # compute parameters
-c_params <- compute_empirical_mesosize(hmu_map,W)
+c_params <- compute_empirical_mesosize(hmu_map,W_emp)
 ```
 
 Step 1) (over-)segment mesh into supercells
@@ -85,6 +85,7 @@ compactness <- 1000
 # compute supercells
 supercells <- elements_to_supercell(flow_wet,area_supercell,compactness)
 
+# plot supercells
 supercells %>%
   ggplot() +
   geom_sf(aes(fill=factor(cluster)),color=NA) +
@@ -105,7 +106,10 @@ n_by <- 10
 n_range <- seq(from=n_min,to=n_max,by=n_by)
 
 #### compute potential mosaics using SKATER algorithm
-list_units <- supercell_to_units(supercells,n_range)
+units_res <- supercell_to_units(supercells,n_range)
+
+list_units <- units_res$list_units # list of mosaics
+skater_res <- units_res$skater_res # skater object, contains information about all possible segmentations with number of units n = 1 ... N
 ```
 
 step 3) Optimal segmentation
@@ -119,10 +123,10 @@ A_tot <- as.numeric(sum(st_area(flow_wet)))
 channel_wet <- flow_to_wetchannel(flow_wet,max_hole_area = 20)
 
 ## compute average wetted channel width
-# adjust parameters trans_longidst and trans_width if needed
-W <- compute_widths(channel_wet,centerline,20,300)
+# adjust parameters trans_longdist and trans_width if needed
+W_mod <- compute_widths(channel_wet,centerline,20,300)
 
-c_params$W_area <- W^2
+c_params$W_area <- W_mod^2
 
 # compute optimality metrics
 optimality_metrics <- compute_optimality_metrics(flow_wet,list_units,n_range,c_params,A_tot)
@@ -136,7 +140,7 @@ opt_units <- list_units[[opt_n$i]]
 print(paste0('optimal n is ',opt_n$n))
 
 # write optimal shp
-# st_write(opt_units,paste0('optimal_mosaic_n',opt_n$n,'.shp'),delete_dsn=T)
+st_write(opt_units,paste0('optimal_mosaic_n',opt_n$n,'.shp'),delete_dsn=T)
 ```
 
 
@@ -146,7 +150,7 @@ step 2 bis) Refine GS curve, by adding additional mosaics with n units to the li
 n_range_toadd <- c(23,24,26,27,28,29)
 
 list_units_old <- list_units
-add_units_results <- add_units(list_units_old,supercells,n_range_toadd)
+add_units_results <- add_units(list_units_old,skater_res,supercells,n_range_toadd)
 
 n_range <- add_units_results$n_range
 list_units <- add_units_results$list_units
