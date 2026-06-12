@@ -2,7 +2,7 @@
 % Please edit documentation in R/elements_to_supercell.R
 \name{elements_to_supercell}
 \alias{elements_to_supercell}
-\title{Compute supercells using a SLIC approach on hydraulic mesh data}
+\title{Compute supercells using a SLIC approach on hydraulic mesh data (new!)}
 \usage{
 elements_to_supercell(mesh, sc_area, compactness)
 }
