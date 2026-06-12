@@ -25,7 +25,6 @@
 #'
 #'
 #' @export
-
 elements_to_supercell <- function(mesh,sc_area,compactness) {
 
   if (!inherits(mesh, "sf")) stop("`mesh` must be an sf object.")

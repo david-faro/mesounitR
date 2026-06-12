@@ -65,6 +65,21 @@ supercell_to_units <- function(supercells,n_range) {
 
   nb <- spdep::poly2nb(supercells_sub, queen = TRUE)
 
+  # check if supercells without neighbours found
+  no_neigh <- which(spdep::card(nb) == 0)
+
+  if (length(no_neigh) > 0) {
+    stop(
+      paste0(
+        "The following supercells have no neighbours: ",
+        paste(no_neigh, collapse = ", "),
+        '\n
+        Neighbourless supercells should be deleted or merged to proceed.'
+      ),
+      call. = FALSE
+    )
+  }
+
   supercells_scaled <- supercells_sub %>%
     sf::st_drop_geometry() %>%
     mutate(
