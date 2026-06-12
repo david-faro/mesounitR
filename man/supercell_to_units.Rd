@@ -18,6 +18,7 @@ A list of:
 \item{skater_res} object returned from skater segmentation
 \item{list_units} list of \code{sf} objects, each representing a segmentation into \code{n} spatial units (as defined in \code{n_range})
 }
+}
 \description{
 Applies spatial regionalization to supercell polygons using the SKATER algorithm.
 This function segments a mesh of supercells into spatial units based on

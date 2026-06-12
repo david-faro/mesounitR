@@ -1,4 +1,4 @@
-#' Compute supercells using a SLIC approach on hydraulic mesh data (new!)
+#' Compute supercells using a SLIC approach on hydraulic mesh data
 #'
 #' This function clusters elements of a computational mesh into supercells
 #' based on hydraulic variables `DEPTH` and `VEL`, using a Simple Linear Iterative
