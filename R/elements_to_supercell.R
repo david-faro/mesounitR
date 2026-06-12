@@ -69,7 +69,7 @@ elements_to_supercell <- function(mesh,sc_area,compactness) {
   # assign to each grid point the average value for DEPTH and VEL of all points falling within an S radius
   grid_valid <- mesh_df[unlist(inter),]
 
-  for (i in 1:length(grid_valid)) {
+  for (i in 1:nrow(grid_valid)) {
 
     dist <- dist2(grid_valid[i,c('X','Y')],mesh_df[,c('X','Y')])
 
@@ -136,15 +136,14 @@ elements_to_supercell <- function(mesh,sc_area,compactness) {
 dist2 <- function(pt1,pt2) {
 
   # repeat vector pt1 to length of pt2
-  pt1 <- rep(pt1,nrow(pt2))
+  pt1 <- pt1[rep(1, nrow(pt2)), , drop = FALSE]
 
   # Compute Euclidean distances using vectorized functions
-  dx <- pt2$x - pt1$x
-  dy <- pt2$y - pt1$y
+  dx <- pt2$X - pt1$X
+  dy <- pt2$Y - pt1$Y
 
   dist <- sqrt(dx^2+dy^2)
 
   return(dist)
 
 }
-
