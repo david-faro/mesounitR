@@ -75,7 +75,10 @@ W_emp <- compute_widths(channel_wet,centerline,20,300)
 c_params <- compute_empirical_mesosize(hmu_map,W_emp)
 ```
 
-Step 1) (over-)segment mesh into supercells
+Step 1) up-scale river elements (mesh) into hydraulic units (supercells)
+
+supercells are computed using modified SLIC algorithm
+
 ```{r}
 # define average supercell area
 area_supercell <- 50 # in m^2, or same unit as mesh
@@ -95,7 +98,11 @@ supercells %>%
 #### write SP map
 # st_write(supercells,'supercells.shp',delete_dsn=T)
 ```
-step 2) regionalize superpixels to a mosaic composed of n units using SKATER spatial clustering algorithm (from spdep package)
+
+step 2) exploration of hierarhical space from micro- to macro-scale 
+
+supercells are clusterized into mosaics of n units using SKATER algorithm (from spdep package)
+
 ```{r}
 #### define computation range
 # number of potential regions in computed mosaics ranges from n_min to n_max, with increments defined by n_by
@@ -112,9 +119,10 @@ list_units <- units_res$list_units # list of mosaics
 skater_res <- units_res$skater_res # skater object, contains information about all possible segmentations with number of units n = 1 ... N
 ```
 
-step 3) Optimal segmentation
+step 3) search for an optimal meso-scale configuration
+
 Compute optimality metrics (v,MI,ms) and the derived Global Score (GS)
---> select optimal region mosaic based on computed GS
+--> select optimal region mosaic by minimizing computed GS
 ```{r}
 # compute wetted channel area of modelled reach
 A_tot <- as.numeric(sum(st_area(flow_wet)))
