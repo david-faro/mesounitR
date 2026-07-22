@@ -80,7 +80,7 @@ Step 1) (over-)segment mesh into supercells
 # define average supercell area
 area_supercell <- 50 # in m^2, or same unit as mesh
 # define compactness parameter of "SLIC" algorithm
-compactness <- 1000
+compactness <- 300
 
 # compute supercells
 supercells <- elements_to_supercell(flow_wet,area_supercell,compactness)
